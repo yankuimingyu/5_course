@@ -59,7 +59,8 @@ static void UserApp1SM_Idle(void);
 static void UserApp1SM_Error(void);         
 static void UserApp1SM_FailedInit(void);        
 
-
+void all_led(void);
+void double_led(void);
 #endif /* __USER_APP1_H */
 
 

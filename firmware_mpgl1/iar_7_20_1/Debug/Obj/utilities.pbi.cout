@@ -1,22 +1,22 @@
-"D:\EIE_GITHUB\Razor_Atmel\firmware_mpg_common\drivers\utilities.c"
+"D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\drivers\utilities.c"
 -std=c99
 -ferror-limit=100
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1\..\bsp
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1\..\bsp
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1\..\drivers
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1\..\drivers
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1\..\application
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1\..\application
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common\application
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common\application
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common\cmsis
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common\cmsis
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common\drivers
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1\..\..\firmware_mpg_common\drivers
 -I
 D:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\CMSIS\Include
 -I
@@ -24,21 +24,21 @@ D:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\inc
 -I
 D:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\inc\c
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\iar_7_20_1
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\iar_7_20_1
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\bsp
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\bsp
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\drivers
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\drivers
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpgl1\application
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpgl1\application
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpg_common
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpg_common\application
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\application
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpg_common\cmsis
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\cmsis
 -I
-D:\EIE_GITHUB\Razor_Atmel\firmware_mpg_common\drivers
+D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\drivers
 -I
 D:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\CMSIS\Include
 -DMPGL1=1
@@ -235,7 +235,7 @@ D:\Program Files (x86)\IAR Systems\Embedded Workbench 7.0\arm\CMSIS\Include
 -D__HAS_LOCATED_WITH_INIT__=1
 -D__IAR_COMPILERBASE__=593924
 -D__DATE__="May  6 2017"
--D__TIME__="00:05:24"
+-D__TIME__="10:00:32"
 -D__STDC__=1
 -D__STDC_VERSION__=199901L
 -D__STDC_HOSTED__=1

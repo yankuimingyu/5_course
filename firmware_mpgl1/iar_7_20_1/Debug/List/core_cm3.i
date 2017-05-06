@@ -1,4 +1,4 @@
-#line 1 "D:\\EIE_GITHUB\\Razor_Atmel\\firmware_mpg_common\\cmsis\\core_cm3.c"
+#line 1 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\cmsis\\core_cm3.c"
 /******************************************************************************
  * @file:    core_cm3.c
  * @purpose: CMSIS Cortex-M3 Core Peripheral Access Layer Source File
@@ -2127,11 +2127,11 @@ typedef int __data_intptr_t; typedef unsigned int __data_uintptr_t;
  * Copyright (c) 1992-2009 by P.J. Plauger.  ALL RIGHTS RESERVED.
  * Consult your license regarding permissions and restrictions.
 V5.04:0576 */
-#line 25 "D:\\EIE_GITHUB\\Razor_Atmel\\firmware_mpg_common\\cmsis\\core_cm3.c"
+#line 25 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\cmsis\\core_cm3.c"
 
 
 /* define compiler specific symbols */
-#line 36 "D:\\EIE_GITHUB\\Razor_Atmel\\firmware_mpg_common\\cmsis\\core_cm3.c"
+#line 36 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\cmsis\\core_cm3.c"
 
 
 
@@ -2140,9 +2140,9 @@ V5.04:0576 */
 
 
 
-#line 266 "D:\\EIE_GITHUB\\Razor_Atmel\\firmware_mpg_common\\cmsis\\core_cm3.c"
+#line 266 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\cmsis\\core_cm3.c"
 /* obsolete */
-#line 611 "D:\\EIE_GITHUB\\Razor_Atmel\\firmware_mpg_common\\cmsis\\core_cm3.c"
+#line 611 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\cmsis\\core_cm3.c"
 
 
 
