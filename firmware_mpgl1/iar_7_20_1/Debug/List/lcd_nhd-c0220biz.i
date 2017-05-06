@@ -16794,6 +16794,7 @@ static void UserApp1SM_FailedInit(void);
 
 void all_led(void);
 void double_led(void);
+void BCD_code_display(void);
 
 
 

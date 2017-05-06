@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR ANSI C/C++ Compiler V7.20.2.7424/W32 for ARM        06/May/2017  10:18:17
+# IAR ANSI C/C++ Compiler V7.20.2.7424/W32 for ARM        06/May/2017  11:44:48
 # Copyright 1999-2014 IAR Systems AB.
 #
 #    Cpu mode     =  thumb
@@ -148,10 +148,10 @@ D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\application\user_app1.c
      92            if( 1 )
      93            {
      94              //UserApp1_StateMachine = UserApp1SM_Idle;
-     95               UserApp1_StateMachine =all_led;
+     95               UserApp1_StateMachine =BCD_code_display;
    \                     UserApp1Initialize: (+1)
-   \   00000000   0x.... 0x....      ADR.W    R0,all_led
-   \   00000004   0x....             LDR.N    R1,??DataTable3
+   \   00000000   0x.... 0x....      ADR.W    R0,BCD_code_display
+   \   00000004   0x....             LDR.N    R1,??DataTable4
    \   00000006   0x6008             STR      R0,[R1, #+0]
      96            }
      97            else
@@ -185,7 +185,7 @@ D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\application\user_app1.c
    \                     UserApp1RunActiveState: (+1)
    \   00000000   0xB580             PUSH     {R7,LR}
     122            UserApp1_StateMachine();
-   \   00000002   0x....             LDR.N    R0,??DataTable3
+   \   00000002   0x....             LDR.N    R0,??DataTable4
    \   00000004   0x6800             LDR      R0,[R0, #+0]
    \   00000006   0x4780             BLX      R0
     123          
@@ -196,64 +196,226 @@ D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\application\user_app1.c
     127          /*--------------------------------------------------------------------------------------------------------------------*/
     128          /* Private functions                                                                                                  */
     129          /*--------------------------------------------------------------------------------------------------------------------*/
-    130          
-    131          
-    132          /**********************************************************************************************************************
-    133          State Machine Function Definitions
-    134          **********************************************************************************************************************/
-    135          
-    136          //
+    130          //
+
+   \                                 In section .text, align 4, keep-with-next
+    131          void BCD_code_display(void)
+    132          {
+   \                     BCD_code_display: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    133            static u16 u16_counter = 0;
+    134            static u8 a_u8_binary[8] =0;
+                                             ^
+Warning[Pe520]: initialization with "{...}" expected for aggregate object
+    135            u8 u8_temp_counter =0;
+   \   00000002   0x2400             MOVS     R4,#+0
+    136            static u8 u8_temp_counter_on=0;
+    137            if(G_u32SystemTime1ms%1000==0)
+   \   00000004   0x....             LDR.N    R0,??DataTable4_1
+   \   00000006   0x6800             LDR      R0,[R0, #+0]
+   \   00000008   0xF44F 0x717A      MOV      R1,#+1000
+   \   0000000C   0xFBB0 0xF2F1      UDIV     R2,R0,R1
+   \   00000010   0xFB01 0x0012      MLS      R0,R1,R2,R0
+   \   00000014   0x2800             CMP      R0,#+0
+   \   00000016   0xD10B             BNE.N    ??BCD_code_display_0
+    138            {
+    139               u16_counter++;
+   \   00000018   0x....             LDR.N    R0,??DataTable4_2
+   \   0000001A   0x8800             LDRH     R0,[R0, #+0]
+   \   0000001C   0x1C40             ADDS     R0,R0,#+1
+   \   0000001E   0x....             LDR.N    R1,??DataTable4_2
+   \   00000020   0x8008             STRH     R0,[R1, #+0]
+    140          	 if(u16_counter>=99)
+   \   00000022   0x....             LDR.N    R0,??DataTable4_2
+   \   00000024   0x8800             LDRH     R0,[R0, #+0]
+   \   00000026   0x2863             CMP      R0,#+99
+   \   00000028   0xDB02             BLT.N    ??BCD_code_display_0
+    141          	 	u16_counter=0;
+   \   0000002A   0x2000             MOVS     R0,#+0
+   \   0000002C   0x....             LDR.N    R1,??DataTable4_2
+   \   0000002E   0x8008             STRH     R0,[R1, #+0]
+    142            }
+    143            ///decade 
+    144            u8_temp_counter_on=u16_counter/10;
+   \                     ??BCD_code_display_0: (+1)
+   \   00000030   0x....             LDR.N    R0,??DataTable4_2
+   \   00000032   0x8800             LDRH     R0,[R0, #+0]
+   \   00000034   0x210A             MOVS     R1,#+10
+   \   00000036   0xFB90 0xF0F1      SDIV     R0,R0,R1
+   \   0000003A   0x....             LDR.N    R1,??DataTable4_3
+   \   0000003C   0x7008             STRB     R0,[R1, #+0]
+    145            for(u8_temp_counter=4;u8_temp_counter<=7;u8_temp_counter++)
+   \   0000003E   0x2004             MOVS     R0,#+4
+   \   00000040   0x0004             MOVS     R4,R0
+   \                     ??BCD_code_display_1: (+1)
+   \   00000042   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000044   0x2C08             CMP      R4,#+8
+   \   00000046   0xDA12             BGE.N    ??BCD_code_display_2
+    146            	{
+    147               a_u8_binary[u8_temp_counter] = u8_temp_counter_on%2;
+   \   00000048   0x....             LDR.N    R0,??DataTable4_3
+   \   0000004A   0x7800             LDRB     R0,[R0, #+0]
+   \   0000004C   0x2102             MOVS     R1,#+2
+   \   0000004E   0xFB90 0xF2F1      SDIV     R2,R0,R1
+   \   00000052   0xFB02 0x0211      MLS      R2,R2,R1,R0
+   \   00000056   0x....             LDR.N    R0,??DataTable4_4
+   \   00000058   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000005A   0x5422             STRB     R2,[R4, R0]
+    148          	 u8_temp_counter_on=u8_temp_counter_on/2;
+   \   0000005C   0x....             LDR.N    R0,??DataTable4_3
+   \   0000005E   0x7800             LDRB     R0,[R0, #+0]
+   \   00000060   0x2102             MOVS     R1,#+2
+   \   00000062   0xFB90 0xF0F1      SDIV     R0,R0,R1
+   \   00000066   0x....             LDR.N    R1,??DataTable4_3
+   \   00000068   0x7008             STRB     R0,[R1, #+0]
+    149            	}
+   \   0000006A   0x1C64             ADDS     R4,R4,#+1
+   \   0000006C   0xE7E9             B.N      ??BCD_code_display_1
+    150            ///signal 
+    151            u8_temp_counter_on=u16_counter%10;
+   \                     ??BCD_code_display_2: (+1)
+   \   0000006E   0x....             LDR.N    R0,??DataTable4_2
+   \   00000070   0x8800             LDRH     R0,[R0, #+0]
+   \   00000072   0x210A             MOVS     R1,#+10
+   \   00000074   0xFB90 0xF2F1      SDIV     R2,R0,R1
+   \   00000078   0xFB01 0x0012      MLS      R0,R1,R2,R0
+   \   0000007C   0x....             LDR.N    R1,??DataTable4_3
+   \   0000007E   0x7008             STRB     R0,[R1, #+0]
+    152            	for(u8_temp_counter=0;u8_temp_counter<=3;u8_temp_counter++)
+   \   00000080   0x2000             MOVS     R0,#+0
+   \   00000082   0x0004             MOVS     R4,R0
+   \                     ??BCD_code_display_3: (+1)
+   \   00000084   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   00000086   0x2C04             CMP      R4,#+4
+   \   00000088   0xDA12             BGE.N    ??BCD_code_display_4
+    153            		{a_u8_binary[u8_temp_counter]=u8_temp_counter_on%2;
+   \   0000008A   0x....             LDR.N    R0,??DataTable4_3
+   \   0000008C   0x7800             LDRB     R0,[R0, #+0]
+   \   0000008E   0x2102             MOVS     R1,#+2
+   \   00000090   0xFB90 0xF2F1      SDIV     R2,R0,R1
+   \   00000094   0xFB02 0x0211      MLS      R2,R2,R1,R0
+   \   00000098   0x....             LDR.N    R0,??DataTable4_4
+   \   0000009A   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   0000009C   0x5422             STRB     R2,[R4, R0]
+    154          	     u8_temp_counter_on=u8_temp_counter_on/2;
+   \   0000009E   0x....             LDR.N    R0,??DataTable4_3
+   \   000000A0   0x7800             LDRB     R0,[R0, #+0]
+   \   000000A2   0x2102             MOVS     R1,#+2
+   \   000000A4   0xFB90 0xF0F1      SDIV     R0,R0,R1
+   \   000000A8   0x....             LDR.N    R1,??DataTable4_3
+   \   000000AA   0x7008             STRB     R0,[R1, #+0]
+    155            		}
+   \   000000AC   0x1C64             ADDS     R4,R4,#+1
+   \   000000AE   0xE7E9             B.N      ??BCD_code_display_3
+    156          	for(u8_temp_counter=0;u8_temp_counter<=7;u8_temp_counter++)
+   \                     ??BCD_code_display_4: (+1)
+   \   000000B0   0x2000             MOVS     R0,#+0
+   \   000000B2   0x0004             MOVS     R4,R0
+   \                     ??BCD_code_display_5: (+1)
+   \   000000B4   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000B6   0x2C08             CMP      R4,#+8
+   \   000000B8   0xDA0F             BGE.N    ??BCD_code_display_6
+    157          		{
+    158          		 if(a_u8_binary[u8_temp_counter]==1)
+   \   000000BA   0x....             LDR.N    R0,??DataTable4_4
+   \   000000BC   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000BE   0x5C20             LDRB     R0,[R4, R0]
+   \   000000C0   0x2801             CMP      R0,#+1
+   \   000000C2   0xD104             BNE.N    ??BCD_code_display_7
+    159          		 	LedOn(u8_temp_counter);
+                 		 	      ^
+Warning[Pe188]: enumerated type mixed with another type
+   \   000000C4   0x0020             MOVS     R0,R4
+   \   000000C6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000C8   0x.... 0x....      BL       LedOn
+   \   000000CC   0xE003             B.N      ??BCD_code_display_8
+    160          		 else
+    161          		 	LedOff(u8_temp_counter);
+                 		 	       ^
+Warning[Pe188]: enumerated type mixed with another type
+   \                     ??BCD_code_display_7: (+1)
+   \   000000CE   0x0020             MOVS     R0,R4
+   \   000000D0   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
+   \   000000D2   0x.... 0x....      BL       LedOff
+    162          		}
+   \                     ??BCD_code_display_8: (+1)
+   \   000000D6   0x1C64             ADDS     R4,R4,#+1
+   \   000000D8   0xE7EC             B.N      ??BCD_code_display_5
+    163          
+    164          	
+    165            
+    166          }
+   \                     ??BCD_code_display_6: (+1)
+   \   000000DA   0xBD10             POP      {R4,PC}          ;; return
+
+   \                                 In section .bss, align 2
+   \                     ??u16_counter:
+   \   00000000                      DS8 2
+
+   \                                 In section .bss, align 4
+   \                     ??a_u8_binary:
+   \   00000000                      DS8 8
+
+   \                                 In section .bss, align 1
+   \                     ??u8_temp_counter_on:
+   \   00000000                      DS8 1
+    167          
+    168          /**********************************************************************************************************************
+    169          State Machine Function Definitions
+    170          **********************************************************************************************************************/
+    171          
+    172          //
 
    \                                 In section .text, align 2, keep-with-next
-    137          void double_led(void)
-    138          {
+    173          void double_led(void)
+    174          {
    \                     double_led: (+1)
    \   00000000   0xB510             PUSH     {R4,LR}
-    139            u8 u8_counter = 0;
+    175            u8 u8_counter = 0;
    \   00000002   0x2400             MOVS     R4,#+0
-    140            if(G_u32SystemTime1ms%500==0)
-   \   00000004   0x....             LDR.N    R0,??DataTable3_1
+    176            if(G_u32SystemTime1ms%500==0)
+   \   00000004   0x....             LDR.N    R0,??DataTable4_1
    \   00000006   0x6800             LDR      R0,[R0, #+0]
    \   00000008   0xF44F 0x71FA      MOV      R1,#+500
    \   0000000C   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000010   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000014   0x2800             CMP      R0,#+0
    \   00000016   0xD10A             BNE.N    ??double_led_0
-    141              for(u8_counter=0;u8_counter<=4;u8_counter++)
+    177              for(u8_counter=0;u8_counter<=4;u8_counter++)
    \   00000018   0x2000             MOVS     R0,#+0
    \   0000001A   0x0004             MOVS     R4,R0
    \                     ??double_led_1: (+1)
    \   0000001C   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   0000001E   0x2C05             CMP      R4,#+5
    \   00000020   0xDA05             BGE.N    ??double_led_0
-    142              {
-    143                LedOn(u8_counter+2);
+    178              {
+    179                LedOn(u8_counter+2);
                              ^
 Warning[Pe188]: enumerated type mixed with another type
    \   00000022   0x1CA0             ADDS     R0,R4,#+2
    \   00000024   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   00000026   0x.... 0x....      BL       LedOn
-    144              }
+    180              }
    \   0000002A   0x1C64             ADDS     R4,R4,#+1
    \   0000002C   0xE7F6             B.N      ??double_led_1
-    145            if(G_u32SystemTime1ms%2000==0)
+    181            if(G_u32SystemTime1ms%2000==0)
    \                     ??double_led_0: (+1)
-   \   0000002E   0x....             LDR.N    R0,??DataTable3_1
+   \   0000002E   0x....             LDR.N    R0,??DataTable4_1
    \   00000030   0x6800             LDR      R0,[R0, #+0]
    \   00000032   0xF44F 0x61FA      MOV      R1,#+2000
    \   00000036   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   0000003A   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   0000003E   0x2800             CMP      R0,#+0
    \   00000040   0xD10A             BNE.N    ??double_led_2
-    146            {
-    147               for(u8_counter=0;u8_counter<=7;u8_counter++)
+    182            {
+    183               for(u8_counter=0;u8_counter<=7;u8_counter++)
    \   00000042   0x2000             MOVS     R0,#+0
    \   00000044   0x0004             MOVS     R4,R0
    \                     ??double_led_3: (+1)
    \   00000046   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   00000048   0x2C08             CMP      R4,#+8
    \   0000004A   0xDA05             BGE.N    ??double_led_2
-    148                 LedOff(u8_counter);
+    184                 LedOff(u8_counter);
                                ^
 Warning[Pe188]: enumerated type mixed with another type
    \   0000004C   0x0020             MOVS     R0,R4
@@ -261,157 +423,172 @@ Warning[Pe188]: enumerated type mixed with another type
    \   00000050   0x.... 0x....      BL       LedOff
    \   00000054   0x1C64             ADDS     R4,R4,#+1
    \   00000056   0xE7F6             B.N      ??double_led_3
-    149            }
-    150            if(G_u32SystemTime1ms%10000==0)
+    185            }
+    186            if(G_u32SystemTime1ms%10000==0)
    \                     ??double_led_2: (+1)
-   \   00000058   0x....             LDR.N    R0,??DataTable3_1
+   \   00000058   0x....             LDR.N    R0,??DataTable4_1
    \   0000005A   0x6800             LDR      R0,[R0, #+0]
    \   0000005C   0xF242 0x7110      MOVW     R1,#+10000
    \   00000060   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000064   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000068   0x2800             CMP      R0,#+0
    \   0000006A   0xD103             BNE.N    ??double_led_4
-    151                UserApp1_StateMachine = all_led;
+    187                UserApp1_StateMachine = all_led;
    \   0000006C   0x.... 0x....      ADR.W    R0,all_led
-   \   00000070   0x....             LDR.N    R1,??DataTable3
+   \   00000070   0x....             LDR.N    R1,??DataTable4
    \   00000072   0x6008             STR      R0,[R1, #+0]
-    152              
-    153              
-    154          }
+    188              
+    189              
+    190          }
    \                     ??double_led_4: (+1)
    \   00000074   0xBD10             POP      {R4,PC}          ;; return
-    155          
-    156          //all led light.
+    191          
+    192          //all led light.
 
    \                                 In section .text, align 4, keep-with-next
-    157          void all_led(void)
-    158          {u8 u8_counter=0;
+    193          void all_led(void)
+    194          {u8 u8_counter=0;
    \                     all_led: (+1)
    \   00000000   0xB510             PUSH     {R4,LR}
    \   00000002   0x2400             MOVS     R4,#+0
-    159              if(G_u32SystemTime1ms%1000==0)
-   \   00000004   0x....             LDR.N    R0,??DataTable3_1
+    195              if(G_u32SystemTime1ms%1000==0)
+   \   00000004   0x....             LDR.N    R0,??DataTable4_1
    \   00000006   0x6800             LDR      R0,[R0, #+0]
    \   00000008   0xF44F 0x717A      MOV      R1,#+1000
    \   0000000C   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000010   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000014   0x2800             CMP      R0,#+0
    \   00000016   0xD10A             BNE.N    ??all_led_0
-    160              {
-    161               for(u8_counter=0;u8_counter<=7;u8_counter++)
+    196              {
+    197               for(u8_counter=0;u8_counter<=7;u8_counter++)
    \   00000018   0x2000             MOVS     R0,#+0
    \   0000001A   0x0004             MOVS     R4,R0
    \                     ??all_led_1: (+1)
    \   0000001C   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   0000001E   0x2C08             CMP      R4,#+8
    \   00000020   0xDA05             BGE.N    ??all_led_0
-    162               {
-    163                 LedOn(u8_counter);
+    198               {
+    199                 LedOn(u8_counter);
                               ^
 Warning[Pe188]: enumerated type mixed with another type
    \   00000022   0x0020             MOVS     R0,R4
    \   00000024   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   00000026   0x.... 0x....      BL       LedOn
-    164                //LedOn(RED);
-    165               }
+    200                //LedOn(RED);
+    201               }
    \   0000002A   0x1C64             ADDS     R4,R4,#+1
    \   0000002C   0xE7F6             B.N      ??all_led_1
-    166              }
-    167              if(G_u32SystemTime1ms%2000==0)
+    202              }
+    203              if(G_u32SystemTime1ms%2000==0)
    \                     ??all_led_0: (+1)
-   \   0000002E   0x....             LDR.N    R0,??DataTable3_1
+   \   0000002E   0x....             LDR.N    R0,??DataTable4_1
    \   00000030   0x6800             LDR      R0,[R0, #+0]
    \   00000032   0xF44F 0x61FA      MOV      R1,#+2000
    \   00000036   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   0000003A   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   0000003E   0x2800             CMP      R0,#+0
    \   00000040   0xD10A             BNE.N    ??all_led_2
-    168              {
-    169                for(u8_counter=0;u8_counter<=7;u8_counter++)
+    204              {
+    205                for(u8_counter=0;u8_counter<=7;u8_counter++)
    \   00000042   0x2000             MOVS     R0,#+0
    \   00000044   0x0004             MOVS     R4,R0
    \                     ??all_led_3: (+1)
    \   00000046   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   00000048   0x2C08             CMP      R4,#+8
    \   0000004A   0xDA05             BGE.N    ??all_led_2
-    170                {
-    171                  LedOff(u8_counter);
+    206                {
+    207                  LedOff(u8_counter);
                                 ^
 Warning[Pe188]: enumerated type mixed with another type
    \   0000004C   0x0020             MOVS     R0,R4
    \   0000004E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   00000050   0x.... 0x....      BL       LedOff
-    172                }
+    208                }
    \   00000054   0x1C64             ADDS     R4,R4,#+1
    \   00000056   0xE7F6             B.N      ??all_led_3
-    173              }
-    174              if(G_u32SystemTime1ms%10000==0)//10
+    209              }
+    210              if(G_u32SystemTime1ms%10000==0)//10
    \                     ??all_led_2: (+1)
-   \   00000058   0x....             LDR.N    R0,??DataTable3_1
+   \   00000058   0x....             LDR.N    R0,??DataTable4_1
    \   0000005A   0x6800             LDR      R0,[R0, #+0]
    \   0000005C   0xF242 0x7110      MOVW     R1,#+10000
    \   00000060   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000064   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000068   0x2800             CMP      R0,#+0
    \   0000006A   0xD102             BNE.N    ??all_led_4
-    175                UserApp1_StateMachine = double_led;
-   \   0000006C   0x....             LDR.N    R0,??DataTable3_2
-   \   0000006E   0x....             LDR.N    R1,??DataTable3
+    211                UserApp1_StateMachine = double_led;
+   \   0000006C   0x....             LDR.N    R0,??DataTable4_5
+   \   0000006E   0x....             LDR.N    R1,??DataTable4
    \   00000070   0x6008             STR      R0,[R1, #+0]
-    176             
-    177              
-    178                
-    179          }
+    212             
+    213              
+    214                
+    215          }
    \                     ??all_led_4: (+1)
    \   00000072   0xBD10             POP      {R4,PC}          ;; return
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable3:
+   \                     ??DataTable4:
    \   00000000   0x........         DC32     UserApp1_StateMachine
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable3_1:
+   \                     ??DataTable4_1:
    \   00000000   0x........         DC32     G_u32SystemTime1ms
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable3_2:
+   \                     ??DataTable4_2:
+   \   00000000   0x........         DC32     ??u16_counter
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4_3:
+   \   00000000   0x........         DC32     ??u8_temp_counter_on
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4_4:
+   \   00000000   0x........         DC32     ??a_u8_binary
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable4_5:
    \   00000000   0x........         DC32     double_led
-    180          ///
-    181          /*-------------------------------------------------------------------------------------------------------------------*/
-    182          /* Wait for ??? */
-    183          static void UserApp1SM_Idle(void)
+    216          ///
+    217          /*-------------------------------------------------------------------------------------------------------------------*/
+    218          /* Wait for ??? */
+    219          static void UserApp1SM_Idle(void)
                              ^
 Warning[Pe177]: function "UserApp1SM_Idle" was declared but never referenced
-    184          {
-    185          
-    186          } /* end UserApp1SM_Idle() */
-    187              
-    188          #if 0
-    189          /*-------------------------------------------------------------------------------------------------------------------*/
-    190          /* Handle an error */
-    191          static void UserApp1SM_Error(void)          
-    192          {
-    193            
-    194          } /* end UserApp1SM_Error() */
-    195          #endif
-    196          
-    197          
-    198          /*-------------------------------------------------------------------------------------------------------------------*/
-    199          /* State to sit in if init failed */
-    200          static void UserApp1SM_FailedInit(void)          
-    201          {
-    202              
-    203          } /* end UserApp1SM_FailedInit() */
-    204          
-    205          
-    206          /*--------------------------------------------------------------------------------------------------------------------*/
-    207          /* End of File                                                                                                        */
-    208          /*--------------------------------------------------------------------------------------------------------------------*/
+    220          {
+    221          
+    222          } /* end UserApp1SM_Idle() */
+    223              
+    224          #if 0
+    225          /*-------------------------------------------------------------------------------------------------------------------*/
+    226          /* Handle an error */
+    227          static void UserApp1SM_Error(void)          
+    228          {
+    229            
+    230          } /* end UserApp1SM_Error() */
+    231          #endif
+    232          
+    233          
+    234          /*-------------------------------------------------------------------------------------------------------------------*/
+    235          /* State to sit in if init failed */
+    236          static void UserApp1SM_FailedInit(void)          
+    237          {
+    238              
+    239          } /* end UserApp1SM_FailedInit() */
+    240          
+    241          
+    242          /*--------------------------------------------------------------------------------------------------------------------*/
+    243          /* End of File                                                                                                        */
+    244          /*--------------------------------------------------------------------------------------------------------------------*/
 
    Maximum stack usage in bytes:
 
    .cstack Function
    ------- --------
+       8   BCD_code_display
+         8   -> LedOff
+         8   -> LedOn
        0   UserApp1Initialize
        8   UserApp1RunActiveState
          8   -- Indirect call
@@ -427,22 +604,29 @@ Warning[Pe177]: function "UserApp1SM_Idle" was declared but never referenced
 
    Bytes  Function/Label
    -----  --------------
-       4  ??DataTable3
-       4  ??DataTable3_1
-       4  ??DataTable3_2
+       4  ??DataTable4
+       4  ??DataTable4_1
+       4  ??DataTable4_2
+       4  ??DataTable4_3
+       4  ??DataTable4_4
+       4  ??DataTable4_5
+     220  BCD_code_display
        4  G_u32UserApp1Flags
       10  UserApp1Initialize
       10  UserApp1RunActiveState
        4  UserApp1_StateMachine
+       8  a_u8_binary
      116  all_led
      118  double_led
+       2  u16_counter
+       1  u8_temp_counter_on
 
  
-   8 bytes in section .bss
- 266 bytes in section .text
+  19 bytes in section .bss
+ 498 bytes in section .text
  
- 266 bytes of CODE memory
-   8 bytes of DATA memory
+ 498 bytes of CODE memory
+  19 bytes of DATA memory
 
 Errors: none
-Warnings: 5
+Warnings: 8

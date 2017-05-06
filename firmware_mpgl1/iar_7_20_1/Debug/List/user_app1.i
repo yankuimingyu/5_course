@@ -16779,6 +16779,7 @@ static void UserApp1SM_FailedInit(void);
 
 void all_led(void);
 void double_led(void);
+void BCD_code_display(void);
 
 
 
@@ -18093,7 +18094,7 @@ void UserApp1Initialize(void)
   if( 1 )
   {
     //UserApp1_StateMachine = UserApp1SM_Idle;
-     UserApp1_StateMachine =all_led;
+     UserApp1_StateMachine =BCD_code_display;
   }
   else
   {
@@ -18128,7 +18129,43 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
+//
+void BCD_code_display(void)
+{
+  static u16 u16_counter = 0;
+  static u8 a_u8_binary[8] =0;
+  u8 u8_temp_counter =0;
+  static u8 u8_temp_counter_on=0;
+  if(G_u32SystemTime1ms%1000==0)
+  {
+     u16_counter++;
+	 if(u16_counter>=99)
+	 	u16_counter=0;
+  }
+  ///decade 
+  u8_temp_counter_on=u16_counter/10;
+  for(u8_temp_counter=4;u8_temp_counter<=7;u8_temp_counter++)
+  	{
+     a_u8_binary[u8_temp_counter] = u8_temp_counter_on%2;
+	 u8_temp_counter_on=u8_temp_counter_on/2;
+  	}
+  ///signal 
+  u8_temp_counter_on=u16_counter%10;
+  	for(u8_temp_counter=0;u8_temp_counter<=3;u8_temp_counter++)
+  		{a_u8_binary[u8_temp_counter]=u8_temp_counter_on%2;
+	     u8_temp_counter_on=u8_temp_counter_on/2;
+  		}
+	for(u8_temp_counter=0;u8_temp_counter<=7;u8_temp_counter++)
+		{
+		 if(a_u8_binary[u8_temp_counter]==1)
+		 	LedOn(u8_temp_counter);
+		 else
+		 	LedOff(u8_temp_counter);
+		}
 
+	
+  
+}
 
 /**********************************************************************************************************************
 State Machine Function Definitions
@@ -18186,7 +18223,7 @@ static void UserApp1SM_Idle(void)
 
 } /* end UserApp1SM_Idle() */
     
-#line 196 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\application\\user_app1.c"
+#line 232 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\application\\user_app1.c"
 
 
 /*-------------------------------------------------------------------------------------------------------------------*/

@@ -92,7 +92,7 @@ void UserApp1Initialize(void)
   if( 1 )
   {
     //UserApp1_StateMachine = UserApp1SM_Idle;
-     UserApp1_StateMachine =all_led;
+     UserApp1_StateMachine =BCD_code_display;
   }
   else
   {
@@ -127,10 +127,42 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-//
+//test
 void BCD_code_display(void)
 {
-  static 
+  static u16 u16_counter = 0;//this varible for counter the 1S
+  static u8 a_u8_binary[8] =0;//to determine what light on
+  u8 u8_temp_counter =0;//for tempoary save 
+  static u8 u8_temp_counter_on=0;//for change the the decema 
+  if(G_u32SystemTime1ms%1000==0)
+  {
+     u16_counter++;
+	 if(u16_counter>=99)
+	 	u16_counter=0;
+  }
+  ///decade 
+  u8_temp_counter_on=u16_counter/10;
+  for(u8_temp_counter=4;u8_temp_counter<=7;u8_temp_counter++)
+  	{
+     a_u8_binary[u8_temp_counter] = u8_temp_counter_on%2;
+	 u8_temp_counter_on=u8_temp_counter_on/2;
+  	}
+  ///signal 
+  u8_temp_counter_on=u16_counter%10;
+  	for(u8_temp_counter=0;u8_temp_counter<=3;u8_temp_counter++)
+  		{a_u8_binary[u8_temp_counter]=u8_temp_counter_on%2;
+	     u8_temp_counter_on=u8_temp_counter_on/2;
+  		}
+	for(u8_temp_counter=0;u8_temp_counter<=7;u8_temp_counter++)
+		{
+		 if(a_u8_binary[u8_temp_counter]==1)
+		 	LedOn(u8_temp_counter);
+		 else
+		 	LedOff(u8_temp_counter);
+		}
+
+	
+  
 }
 
 /**********************************************************************************************************************
