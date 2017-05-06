@@ -16780,6 +16780,11 @@ static void UserApp1SM_FailedInit(void);
 void all_led(void);
 void double_led(void);
 void BCD_code_display(void);
+void Led_API_test(void);
+void button_pressed(void);
+void password_button(void);
+
+
 
 
 
@@ -18089,12 +18094,22 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
- 
+	LedOff(BLUE);
+	LedOff(YELLOW);
+	LedOff(RED);
+	LedOff(PURPLE);
+/*
+ LedOn(BLUE);
+ LedToggle(PURPLE);
+ LedPWM(RED,LED_PWM_10);
+ LedBlink(YELLOW,LED_2HZ);
+ */
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    //UserApp1_StateMachine = UserApp1SM_Idle;
-     UserApp1_StateMachine =BCD_code_display;
+   // UserApp1_StateMachine = UserApp1SM_Idle;
+   UserApp1_StateMachine =   password_button;
+     //UserApp1_StateMachine =BCD_code_display;
   }
   else
   {
@@ -18124,18 +18139,145 @@ void UserApp1RunActiveState(void)
   UserApp1_StateMachine();
 
 } /* end UserApp1RunActiveState */
+//
+void password_button(void)
+{  
+     static u8 u8_password[4]={0,2,3,1};
+	 static u8 u8_input_button[4]={0};
+	 static  u8 u8_counter_buttton_press=0;
+	 static  BOOL B_Pass_No[3]= FALSE;
+	 u8 u8_temp_number     =0;
+	 if(u8_counter_buttton_press<=3)//you can input the password
+		 	{
+		 if(WasButtonPressed((u32)0))
+		 	{
+		 	  u8_input_button[u8_counter_buttton_press]=0;
+		 	  
+		 	  ButtonAcknowledge((u32)0);
+			  u8_counter_buttton_press++;
+		 	}
 
+		 if(WasButtonPressed((u32)1))
+		 	{
+		 	 u8_input_button[u8_counter_buttton_press]=1;
+			 ButtonAcknowledge((u32)1);
+			 u8_counter_buttton_press++;
+		 	}
+		 if(WasButtonPressed((u32)2))
+		 	{
+		 	u8_input_button[u8_counter_buttton_press]=2;
+			ButtonAcknowledge((u32)2);
+			u8_counter_buttton_press++;
+		 	}
+		 if(WasButtonPressed((u32)3))
+		 	{
+		 	  u8_input_button[u8_counter_buttton_press]=3;
+			  	ButtonAcknowledge((u32)3);
+			  u8_counter_buttton_press++;
+		 	}
+	 	}
+	 if(u8_counter_buttton_press==3)//stop input password
+	 	LedOn(RED);
+	// for(u8_temp_number=0;u8_temp_number<=3;u8_temp_number++)
+	 	//{
+	 	do{
+	 	  if(u8_password[u8_temp_number]==u8_input_button[u8_temp_number])
+		  	{u8_temp_number++;
+		     B_Pass_No[0]= TRUE;
+	 	  	}
+		  else
+		  	{
+		  	  B_Pass_No[0]=FALSE;
+			  break;
+		  	}
+		  	
+	      } 	
+		 while(u8_temp_number<=3);//}
+   if(B_Pass_No[0]==TRUE)
+   	{
+   	    if(G_u32SystemTime1ms%1000==0)
+			LedToggle(BLUE);
+   	}
+	 
+}
+//
+void button_pressed(void)
+{ 
+  static bool B_ispressed[3] = FALSE;
+ if(  IsButtonPressed((u32)0)==TRUE)
+ 	{
+ 	  if(B_ispressed[0]==FALSE)
+ 	  	{
+ 	  	   LedOn(RED);
+ 	  	  B_ispressed[0] =TRUE;
+ 	  	}
+	  else
+	  	{
+	  	B_ispressed[0]=FALSE;
+		LedOff(RED);
+	  	}
+	  
+ 	   //LedOn(RED);
+ 	}
+
+ if(WasButtonPressed((u32)1))
+ 	{
+ 	    if(B_ispressed[1]==FALSE)
+ 	    	{
+ 	    	B_ispressed[1]= TRUE;
+			LedOn(BLUE);
+ 	    	}
+		else
+			{
+			B_ispressed[1]=FALSE;
+			LedOff(BLUE);
+			}
+		ButtonAcknowledge((u32)1);
+ 	}
+    
+}
+//pwm toggle test
+void Led_API_test(void)
+	{bool B_button_pressed[4]= FALSE;
+	
+     if(WasButtonPressed((u32)0))
+     	{
+     	  if(B_button_pressed[0]==FALSE)
+		  	B_button_pressed[0]= TRUE;
+		  else
+		  	B_button_pressed[0] = FALSE;
+     	 ButtonAcknowledge((u32)0);
+     	}
+	 if(WasButtonPressed((u32)1))
+	 	{
+	 	if(B_button_pressed[1]==FALSE)
+			B_button_pressed[1]=TRUE;
+		else
+			B_button_pressed[1]=FALSE;
+	 	 ButtonAcknowledge((u32)1);
+		 
+	 	}
+	 if(B_button_pressed[0]==TRUE)
+	 	{
+	 	if(G_u32SystemTime1ms%1000==0)
+	 	LedToggle(RED);
+	 	}
+	 if(B_button_pressed[1]==TRUE)
+	 	{
+	 	//LedPWM(LedNumberType eLED_,LedRateType ePwmRate_)
+	 	}
+	}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-//
+//test 2017-5-6
 void BCD_code_display(void)
 {
-  static u16 u16_counter = 0;
-  static u8 a_u8_binary[8] =0;
-  u8 u8_temp_counter =0;
-  static u8 u8_temp_counter_on=0;
+  static u16 u16_counter = 0;//this varible for counter the 1S
+  static u8 a_u8_binary[8] =0;//to determine what light on
+  u8 u8_temp_counter =0;//for tempoary save 
+  static u8 u8_temp_counter_on=0;//for change the the decema 
   if(G_u32SystemTime1ms%1000==0)
   {
      u16_counter++;
@@ -18220,10 +18362,21 @@ void all_led(void)
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+static u8 u8_pwm_red = 0;
+ if(G_u32SystemTime1ms%1000==0)//blink purple
+ 	{
+ 	LedToggle(PURPLE);
+	u8_pwm_red++;
+	if(u8_pwm_red>=20)
+		u8_pwm_red=0;
 
+	LedPWM(RED,u8_pwm_red);
+ 	}
+ 
+ 
 } /* end UserApp1SM_Idle() */
     
-#line 232 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\application\\user_app1.c"
+#line 380 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\application\\user_app1.c"
 
 
 /*-------------------------------------------------------------------------------------------------------------------*/

@@ -16782,6 +16782,11 @@ static void UserApp1SM_FailedInit(void);
 void all_led(void);
 void double_led(void);
 void BCD_code_display(void);
+void Led_API_test(void);
+void button_pressed(void);
+void password_button(void);
+
+
 
 
 

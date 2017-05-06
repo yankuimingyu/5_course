@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR ANSI C/C++ Compiler V7.20.2.7424/W32 for ARM        06/May/2017  11:44:48
+# IAR ANSI C/C++ Compiler V7.20.2.7424/W32 for ARM        06/May/2017  16:10:36
 # Copyright 1999-2014 IAR Systems AB.
 #
 #    Cpu mode     =  thumb
@@ -143,171 +143,569 @@ D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\application\user_app1.c
    \                                 In section .text, align 2, keep-with-next
      88          void UserApp1Initialize(void)
      89          {
-     90           
-     91            /* If good initialization, set state to Idle */
-     92            if( 1 )
-     93            {
-     94              //UserApp1_StateMachine = UserApp1SM_Idle;
-     95               UserApp1_StateMachine =BCD_code_display;
    \                     UserApp1Initialize: (+1)
-   \   00000000   0x.... 0x....      ADR.W    R0,BCD_code_display
-   \   00000004   0x....             LDR.N    R1,??DataTable4
-   \   00000006   0x6008             STR      R0,[R1, #+0]
-     96            }
-     97            else
-     98            {
-     99              /* The task isn't properly initialized, so shut it down and don't run */
-    100              UserApp1_StateMachine = UserApp1SM_FailedInit;
-    101            }
-    102          
-    103          } /* end UserApp1Initialize() */
-   \   00000008   0x4770             BX       LR               ;; return
-    104          
-    105            
-    106          /*----------------------------------------------------------------------------------------------------------------------
-    107          Function UserApp1RunActiveState()
-    108          
-    109          Description:
-    110          Selects and runs one iteration of the current state in the state machine.
-    111          All state machines have a TOTAL of 1ms to execute, so on average n state machines
-    112          may take 1ms / n to execute.
-    113          
-    114          Requires:
-    115            - State machine function pointer points at current state
-    116          
-    117          Promises:
-    118            - Calls the function to pointed by the state machine function pointer
-    119          */
+   \   00000000   0xB580             PUSH     {R7,LR}
+     90          	LedOff(BLUE);
+   \   00000002   0x2002             MOVS     R0,#+2
+   \   00000004   0x.... 0x....      BL       LedOff
+     91          	LedOff(YELLOW);
+   \   00000008   0x2005             MOVS     R0,#+5
+   \   0000000A   0x.... 0x....      BL       LedOff
+     92          	LedOff(RED);
+   \   0000000E   0x2007             MOVS     R0,#+7
+   \   00000010   0x.... 0x....      BL       LedOff
+     93          	LedOff(PURPLE);
+   \   00000014   0x2001             MOVS     R0,#+1
+   \   00000016   0x.... 0x....      BL       LedOff
+     94          /*
+     95           LedOn(BLUE);
+     96           LedToggle(PURPLE);
+     97           LedPWM(RED,LED_PWM_10);
+     98           LedBlink(YELLOW,LED_2HZ);
+     99           */
+    100            /* If good initialization, set state to Idle */
+    101            if( 1 )
+    102            {
+    103             // UserApp1_StateMachine = UserApp1SM_Idle;
+    104             UserApp1_StateMachine =   password_button;
+   \   0000001A   0x.... 0x....      ADR.W    R0,password_button
+   \   0000001E   0x.... 0x....      LDR.W    R1,??DataTable7
+   \   00000022   0x6008             STR      R0,[R1, #+0]
+    105               //UserApp1_StateMachine =BCD_code_display;
+    106            }
+    107            else
+    108            {
+    109              /* The task isn't properly initialized, so shut it down and don't run */
+    110              UserApp1_StateMachine = UserApp1SM_FailedInit;
+    111            }
+    112          
+    113          } /* end UserApp1Initialize() */
+   \   00000024   0xBD01             POP      {R0,PC}          ;; return
+    114          
+    115            
+    116          /*----------------------------------------------------------------------------------------------------------------------
+    117          Function UserApp1RunActiveState()
+    118          
+    119          Description:
+    120          Selects and runs one iteration of the current state in the state machine.
+    121          All state machines have a TOTAL of 1ms to execute, so on average n state machines
+    122          may take 1ms / n to execute.
+    123          
+    124          Requires:
+    125            - State machine function pointer points at current state
+    126          
+    127          Promises:
+    128            - Calls the function to pointed by the state machine function pointer
+    129          */
 
    \                                 In section .text, align 2, keep-with-next
-    120          void UserApp1RunActiveState(void)
-    121          {
+    130          void UserApp1RunActiveState(void)
+    131          {
    \                     UserApp1RunActiveState: (+1)
    \   00000000   0xB580             PUSH     {R7,LR}
-    122            UserApp1_StateMachine();
-   \   00000002   0x....             LDR.N    R0,??DataTable4
-   \   00000004   0x6800             LDR      R0,[R0, #+0]
-   \   00000006   0x4780             BLX      R0
-    123          
-    124          } /* end UserApp1RunActiveState */
-   \   00000008   0xBD01             POP      {R0,PC}          ;; return
-    125          
-    126          
-    127          /*--------------------------------------------------------------------------------------------------------------------*/
-    128          /* Private functions                                                                                                  */
-    129          /*--------------------------------------------------------------------------------------------------------------------*/
-    130          //
+    132            UserApp1_StateMachine();
+   \   00000002   0x.... 0x....      LDR.W    R0,??DataTable7
+   \   00000006   0x6800             LDR      R0,[R0, #+0]
+   \   00000008   0x4780             BLX      R0
+    133          
+    134          } /* end UserApp1RunActiveState */
+   \   0000000A   0xBD01             POP      {R0,PC}          ;; return
+    135          //
 
    \                                 In section .text, align 4, keep-with-next
-    131          void BCD_code_display(void)
-    132          {
+    136          void password_button(void)
+    137          {  
+   \                     password_button: (+1)
+   \   00000000   0xB510             PUSH     {R4,LR}
+    138               static u8 u8_password[4]={0,2,3,1};
+    139          	 static u8 u8_input_button[4]={0};
+    140          	 static  u8 u8_counter_buttton_press=0;
+    141          	 static  BOOL B_Pass_No[3]= FALSE;
+                 	                            ^
+Warning[Pe520]: initialization with "{...}" expected for aggregate object
+    142          	 u8 u8_temp_number     =0;
+   \   00000002   0x2400             MOVS     R4,#+0
+    143          	 if(u8_counter_buttton_press<=3)//you can input the password
+   \   00000004   0x.... 0x....      LDR.W    R0,??DataTable7_1
+   \   00000008   0x7800             LDRB     R0,[R0, #+0]
+   \   0000000A   0x2804             CMP      R0,#+4
+   \   0000000C   0xDA51             BGE.N    ??password_button_0
+    144          		 	{
+    145          		 if(WasButtonPressed(BUTTON0))
+   \   0000000E   0x2000             MOVS     R0,#+0
+   \   00000010   0x.... 0x....      BL       WasButtonPressed
+   \   00000014   0x2800             CMP      R0,#+0
+   \   00000016   0xD010             BEQ.N    ??password_button_1
+    146          		 	{
+    147          		 	  u8_input_button[u8_counter_buttton_press]=0;
+   \   00000018   0x2000             MOVS     R0,#+0
+   \   0000001A   0x.... 0x....      LDR.W    R1,??DataTable7_2
+   \   0000001E   0x.... 0x....      LDR.W    R2,??DataTable7_1
+   \   00000022   0x7812             LDRB     R2,[R2, #+0]
+   \   00000024   0x5450             STRB     R0,[R2, R1]
+    148          		 	  
+    149          		 	  ButtonAcknowledge(BUTTON0);
+   \   00000026   0x2000             MOVS     R0,#+0
+   \   00000028   0x.... 0x....      BL       ButtonAcknowledge
+    150          			  u8_counter_buttton_press++;
+   \   0000002C   0x.... 0x....      LDR.W    R0,??DataTable7_1
+   \   00000030   0x7800             LDRB     R0,[R0, #+0]
+   \   00000032   0x1C40             ADDS     R0,R0,#+1
+   \   00000034   0x.... 0x....      LDR.W    R1,??DataTable7_1
+   \   00000038   0x7008             STRB     R0,[R1, #+0]
+    151          		 	}
+    152          
+    153          		 if(WasButtonPressed(BUTTON1))
+   \                     ??password_button_1: (+1)
+   \   0000003A   0x2001             MOVS     R0,#+1
+   \   0000003C   0x.... 0x....      BL       WasButtonPressed
+   \   00000040   0x2800             CMP      R0,#+0
+   \   00000042   0xD010             BEQ.N    ??password_button_2
+    154          		 	{
+    155          		 	 u8_input_button[u8_counter_buttton_press]=1;
+   \   00000044   0x2001             MOVS     R0,#+1
+   \   00000046   0x.... 0x....      LDR.W    R1,??DataTable7_2
+   \   0000004A   0x.... 0x....      LDR.W    R2,??DataTable7_1
+   \   0000004E   0x7812             LDRB     R2,[R2, #+0]
+   \   00000050   0x5450             STRB     R0,[R2, R1]
+    156          			 ButtonAcknowledge(BUTTON1);
+   \   00000052   0x2001             MOVS     R0,#+1
+   \   00000054   0x.... 0x....      BL       ButtonAcknowledge
+    157          			 u8_counter_buttton_press++;
+   \   00000058   0x.... 0x....      LDR.W    R0,??DataTable7_1
+   \   0000005C   0x7800             LDRB     R0,[R0, #+0]
+   \   0000005E   0x1C40             ADDS     R0,R0,#+1
+   \   00000060   0x.... 0x....      LDR.W    R1,??DataTable7_1
+   \   00000064   0x7008             STRB     R0,[R1, #+0]
+    158          		 	}
+    159          		 if(WasButtonPressed(BUTTON2))
+   \                     ??password_button_2: (+1)
+   \   00000066   0x2002             MOVS     R0,#+2
+   \   00000068   0x.... 0x....      BL       WasButtonPressed
+   \   0000006C   0x2800             CMP      R0,#+0
+   \   0000006E   0xD00E             BEQ.N    ??password_button_3
+    160          		 	{
+    161          		 	u8_input_button[u8_counter_buttton_press]=2;
+   \   00000070   0x2002             MOVS     R0,#+2
+   \   00000072   0x.... 0x....      LDR.W    R1,??DataTable7_2
+   \   00000076   0x.... 0x....      LDR.W    R2,??DataTable7_1
+   \   0000007A   0x7812             LDRB     R2,[R2, #+0]
+   \   0000007C   0x5450             STRB     R0,[R2, R1]
+    162          			ButtonAcknowledge(BUTTON2);
+   \   0000007E   0x2002             MOVS     R0,#+2
+   \   00000080   0x.... 0x....      BL       ButtonAcknowledge
+    163          			u8_counter_buttton_press++;
+   \   00000084   0x....             LDR.N    R0,??DataTable7_1
+   \   00000086   0x7800             LDRB     R0,[R0, #+0]
+   \   00000088   0x1C40             ADDS     R0,R0,#+1
+   \   0000008A   0x....             LDR.N    R1,??DataTable7_1
+   \   0000008C   0x7008             STRB     R0,[R1, #+0]
+    164          		 	}
+    165          		 if(WasButtonPressed(BUTTON3))
+   \                     ??password_button_3: (+1)
+   \   0000008E   0x2003             MOVS     R0,#+3
+   \   00000090   0x.... 0x....      BL       WasButtonPressed
+   \   00000094   0x2800             CMP      R0,#+0
+   \   00000096   0xD00C             BEQ.N    ??password_button_0
+    166          		 	{
+    167          		 	  u8_input_button[u8_counter_buttton_press]=3;
+   \   00000098   0x2003             MOVS     R0,#+3
+   \   0000009A   0x....             LDR.N    R1,??DataTable7_2
+   \   0000009C   0x....             LDR.N    R2,??DataTable7_1
+   \   0000009E   0x7812             LDRB     R2,[R2, #+0]
+   \   000000A0   0x5450             STRB     R0,[R2, R1]
+    168          			  	ButtonAcknowledge(BUTTON3);
+   \   000000A2   0x2003             MOVS     R0,#+3
+   \   000000A4   0x.... 0x....      BL       ButtonAcknowledge
+    169          			  u8_counter_buttton_press++;
+   \   000000A8   0x....             LDR.N    R0,??DataTable7_1
+   \   000000AA   0x7800             LDRB     R0,[R0, #+0]
+   \   000000AC   0x1C40             ADDS     R0,R0,#+1
+   \   000000AE   0x....             LDR.N    R1,??DataTable7_1
+   \   000000B0   0x7008             STRB     R0,[R1, #+0]
+    170          		 	}
+    171          	 	}
+    172          	 if(u8_counter_buttton_press==3)//stop input password
+   \                     ??password_button_0: (+1)
+   \   000000B2   0x....             LDR.N    R0,??DataTable7_1
+   \   000000B4   0x7800             LDRB     R0,[R0, #+0]
+   \   000000B6   0x2803             CMP      R0,#+3
+   \   000000B8   0xD102             BNE.N    ??password_button_4
+    173          	 	LedOn(RED);
+   \   000000BA   0x2007             MOVS     R0,#+7
+   \   000000BC   0x.... 0x....      BL       LedOn
+    174          	// for(u8_temp_number=0;u8_temp_number<=3;u8_temp_number++)
+    175          	 	//{
+    176          	 	do{
+    177          	 	  if(u8_password[u8_temp_number]==u8_input_button[u8_temp_number])
+   \                     ??password_button_4: (+1)
+   \   000000C0   0x....             LDR.N    R0,??DataTable7_3
+   \   000000C2   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000C4   0x5C20             LDRB     R0,[R4, R0]
+   \   000000C6   0x....             LDR.N    R1,??DataTable7_2
+   \   000000C8   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000CA   0x5C61             LDRB     R1,[R4, R1]
+   \   000000CC   0x4288             CMP      R0,R1
+   \   000000CE   0xD107             BNE.N    ??password_button_5
+    178          		  	{u8_temp_number++;
+   \   000000D0   0x1C64             ADDS     R4,R4,#+1
+    179          		     B_Pass_No[0]= TRUE;
+   \   000000D2   0x2001             MOVS     R0,#+1
+   \   000000D4   0x....             LDR.N    R1,??DataTable7_4
+   \   000000D6   0x7008             STRB     R0,[R1, #+0]
+    180          	 	  	}
+    181          		  else
+    182          		  	{
+    183          		  	  B_Pass_No[0]=FALSE;
+    184          			  break;
+    185          		  	}
+    186          		  	
+    187          	      } 	
+    188          		 while(u8_temp_number<=3);//}
+   \   000000D8   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
+   \   000000DA   0x2C04             CMP      R4,#+4
+   \   000000DC   0xDBF0             BLT.N    ??password_button_4
+   \   000000DE   0xE002             B.N      ??password_button_6
+   \                     ??password_button_5: (+1)
+   \   000000E0   0x2000             MOVS     R0,#+0
+   \   000000E2   0x....             LDR.N    R1,??DataTable7_4
+   \   000000E4   0x7008             STRB     R0,[R1, #+0]
+    189             if(B_Pass_No[0]==TRUE)
+   \                     ??password_button_6: (+1)
+   \   000000E6   0x....             LDR.N    R0,??DataTable7_4
+   \   000000E8   0x7800             LDRB     R0,[R0, #+0]
+   \   000000EA   0x2801             CMP      R0,#+1
+   \   000000EC   0xD10C             BNE.N    ??password_button_7
+    190             	{
+    191             	    if(G_u32SystemTime1ms%1000==0)
+   \   000000EE   0x....             LDR.N    R0,??DataTable7_5
+   \   000000F0   0x6800             LDR      R0,[R0, #+0]
+   \   000000F2   0xF44F 0x717A      MOV      R1,#+1000
+   \   000000F6   0xFBB0 0xF2F1      UDIV     R2,R0,R1
+   \   000000FA   0xFB01 0x0012      MLS      R0,R1,R2,R0
+   \   000000FE   0x2800             CMP      R0,#+0
+   \   00000100   0xD102             BNE.N    ??password_button_7
+    192          			LedToggle(BLUE);
+   \   00000102   0x2002             MOVS     R0,#+2
+   \   00000104   0x.... 0x....      BL       LedToggle
+    193             	}
+    194          	 
+    195          }
+   \                     ??password_button_7: (+1)
+   \   00000108   0xBD10             POP      {R4,PC}          ;; return
+
+   \                                 In section .data, align 4
+   \                     ??u8_password:
+   \   00000000   0x00 0x02          DC8 0, 2, 3, 1
+   \              0x03 0x01    
+
+   \                                 In section .bss, align 4
+   \                     ??u8_input_button:
+   \   00000000                      DS8 4
+
+   \                                 In section .bss, align 1
+   \                     ??u8_counter_buttton_press:
+   \   00000000                      DS8 1
+
+   \                                 In section .bss, align 4
+   \                     ??B_Pass_No:
+   \   00000000                      DS8 4
+    196          //
+
+   \                                 In section .text, align 2, keep-with-next
+    197          void button_pressed(void)
+    198          { 
+   \                     button_pressed: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+    199            static bool B_ispressed[3] = FALSE;
+                                                ^
+Warning[Pe520]: initialization with "{...}" expected for aggregate object
+    200           if(  IsButtonPressed(BUTTON0)==TRUE)
+   \   00000002   0x2000             MOVS     R0,#+0
+   \   00000004   0x.... 0x....      BL       IsButtonPressed
+   \   00000008   0x2801             CMP      R0,#+1
+   \   0000000A   0xD110             BNE.N    ??button_pressed_0
+    201           	{
+    202           	  if(B_ispressed[0]==FALSE)
+   \   0000000C   0x....             LDR.N    R0,??DataTable7_6
+   \   0000000E   0x7800             LDRB     R0,[R0, #+0]
+   \   00000010   0x2800             CMP      R0,#+0
+   \   00000012   0xD106             BNE.N    ??button_pressed_1
+    203           	  	{
+    204           	  	   LedOn(RED);
+   \   00000014   0x2007             MOVS     R0,#+7
+   \   00000016   0x.... 0x....      BL       LedOn
+    205           	  	  B_ispressed[0] =TRUE;
+   \   0000001A   0x2001             MOVS     R0,#+1
+   \   0000001C   0x....             LDR.N    R1,??DataTable7_6
+   \   0000001E   0x7008             STRB     R0,[R1, #+0]
+   \   00000020   0xE005             B.N      ??button_pressed_0
+    206           	  	}
+    207          	  else
+    208          	  	{
+    209          	  	B_ispressed[0]=FALSE;
+   \                     ??button_pressed_1: (+1)
+   \   00000022   0x2000             MOVS     R0,#+0
+   \   00000024   0x....             LDR.N    R1,??DataTable7_6
+   \   00000026   0x7008             STRB     R0,[R1, #+0]
+    210          		LedOff(RED);
+   \   00000028   0x2007             MOVS     R0,#+7
+   \   0000002A   0x.... 0x....      BL       LedOff
+    211          	  	}
+    212          	  
+    213           	   //LedOn(RED);
+    214           	}
+    215          
+    216           if(WasButtonPressed(BUTTON1))
+   \                     ??button_pressed_0: (+1)
+   \   0000002E   0x2001             MOVS     R0,#+1
+   \   00000030   0x.... 0x....      BL       WasButtonPressed
+   \   00000034   0x2800             CMP      R0,#+0
+   \   00000036   0xD013             BEQ.N    ??button_pressed_2
+    217           	{
+    218           	    if(B_ispressed[1]==FALSE)
+   \   00000038   0x....             LDR.N    R0,??DataTable7_6
+   \   0000003A   0x7840             LDRB     R0,[R0, #+1]
+   \   0000003C   0x2800             CMP      R0,#+0
+   \   0000003E   0xD106             BNE.N    ??button_pressed_3
+    219           	    	{
+    220           	    	B_ispressed[1]= TRUE;
+   \   00000040   0x2001             MOVS     R0,#+1
+   \   00000042   0x....             LDR.N    R1,??DataTable7_6
+   \   00000044   0x7048             STRB     R0,[R1, #+1]
+    221          			LedOn(BLUE);
+   \   00000046   0x2002             MOVS     R0,#+2
+   \   00000048   0x.... 0x....      BL       LedOn
+   \   0000004C   0xE005             B.N      ??button_pressed_4
+    222           	    	}
+    223          		else
+    224          			{
+    225          			B_ispressed[1]=FALSE;
+   \                     ??button_pressed_3: (+1)
+   \   0000004E   0x2000             MOVS     R0,#+0
+   \   00000050   0x....             LDR.N    R1,??DataTable7_6
+   \   00000052   0x7048             STRB     R0,[R1, #+1]
+    226          			LedOff(BLUE);
+   \   00000054   0x2002             MOVS     R0,#+2
+   \   00000056   0x.... 0x....      BL       LedOff
+    227          			}
+    228          		ButtonAcknowledge(BUTTON1);
+   \                     ??button_pressed_4: (+1)
+   \   0000005A   0x2001             MOVS     R0,#+1
+   \   0000005C   0x.... 0x....      BL       ButtonAcknowledge
+    229           	}
+    230              
+    231          }
+   \                     ??button_pressed_2: (+1)
+   \   00000060   0xBD01             POP      {R0,PC}          ;; return
+
+   \                                 In section .bss, align 4
+   \                     ??B_ispressed:
+   \   00000000                      DS8 4
+    232          //pwm toggle test
+
+   \                                 In section .text, align 2, keep-with-next
+    233          void Led_API_test(void)
+    234          	{bool B_button_pressed[4]= FALSE;
+                 	                           ^
+Warning[Pe520]: initialization with "{...}" expected for aggregate object
+   \                     Led_API_test: (+1)
+   \   00000000   0xB580             PUSH     {R7,LR}
+   \   00000002   0xA800             ADD      R0,SP,#+0
+   \   00000004   0x2100             MOVS     R1,#+0
+   \   00000006   0x6001             STR      R1,[R0, #+0]
+    235          	
+    236               if(WasButtonPressed(BUTTON0))
+   \   00000008   0x2000             MOVS     R0,#+0
+   \   0000000A   0x.... 0x....      BL       WasButtonPressed
+   \   0000000E   0x2800             CMP      R0,#+0
+   \   00000010   0xD00D             BEQ.N    ??Led_API_test_0
+    237               	{
+    238               	  if(B_button_pressed[0]==FALSE)
+   \   00000012   0xF89D 0x0000      LDRB     R0,[SP, #+0]
+   \   00000016   0x2800             CMP      R0,#+0
+   \   00000018   0xD103             BNE.N    ??Led_API_test_1
+    239          		  	B_button_pressed[0]= TRUE;
+   \   0000001A   0x2001             MOVS     R0,#+1
+   \   0000001C   0xF88D 0x0000      STRB     R0,[SP, #+0]
+   \   00000020   0xE002             B.N      ??Led_API_test_2
+    240          		  else
+    241          		  	B_button_pressed[0] = FALSE;
+   \                     ??Led_API_test_1: (+1)
+   \   00000022   0x2000             MOVS     R0,#+0
+   \   00000024   0xF88D 0x0000      STRB     R0,[SP, #+0]
+    242               	 ButtonAcknowledge(BUTTON0);
+   \                     ??Led_API_test_2: (+1)
+   \   00000028   0x2000             MOVS     R0,#+0
+   \   0000002A   0x.... 0x....      BL       ButtonAcknowledge
+    243               	}
+    244          	 if(WasButtonPressed(BUTTON1))
+   \                     ??Led_API_test_0: (+1)
+   \   0000002E   0x2001             MOVS     R0,#+1
+   \   00000030   0x.... 0x....      BL       WasButtonPressed
+   \   00000034   0x2800             CMP      R0,#+0
+   \   00000036   0xD00D             BEQ.N    ??Led_API_test_3
+    245          	 	{
+    246          	 	if(B_button_pressed[1]==FALSE)
+   \   00000038   0xF89D 0x0001      LDRB     R0,[SP, #+1]
+   \   0000003C   0x2800             CMP      R0,#+0
+   \   0000003E   0xD103             BNE.N    ??Led_API_test_4
+    247          			B_button_pressed[1]=TRUE;
+   \   00000040   0x2001             MOVS     R0,#+1
+   \   00000042   0xF88D 0x0001      STRB     R0,[SP, #+1]
+   \   00000046   0xE002             B.N      ??Led_API_test_5
+    248          		else
+    249          			B_button_pressed[1]=FALSE;
+   \                     ??Led_API_test_4: (+1)
+   \   00000048   0x2000             MOVS     R0,#+0
+   \   0000004A   0xF88D 0x0001      STRB     R0,[SP, #+1]
+    250          	 	 ButtonAcknowledge(BUTTON1);
+   \                     ??Led_API_test_5: (+1)
+   \   0000004E   0x2001             MOVS     R0,#+1
+   \   00000050   0x.... 0x....      BL       ButtonAcknowledge
+    251          		 
+    252          	 	}
+    253          	 if(B_button_pressed[0]==TRUE)
+   \                     ??Led_API_test_3: (+1)
+   \   00000054   0xF89D 0x0000      LDRB     R0,[SP, #+0]
+   \   00000058   0x2801             CMP      R0,#+1
+   \   0000005A   0xD10C             BNE.N    ??Led_API_test_6
+    254          	 	{
+    255          	 	if(G_u32SystemTime1ms%1000==0)
+   \   0000005C   0x....             LDR.N    R0,??DataTable7_5
+   \   0000005E   0x6800             LDR      R0,[R0, #+0]
+   \   00000060   0xF44F 0x717A      MOV      R1,#+1000
+   \   00000064   0xFBB0 0xF2F1      UDIV     R2,R0,R1
+   \   00000068   0xFB01 0x0012      MLS      R0,R1,R2,R0
+   \   0000006C   0x2800             CMP      R0,#+0
+   \   0000006E   0xD102             BNE.N    ??Led_API_test_6
+    256          	 	LedToggle(RED);
+   \   00000070   0x2007             MOVS     R0,#+7
+   \   00000072   0x.... 0x....      BL       LedToggle
+    257          	 	}
+    258          	 if(B_button_pressed[1]==TRUE)
+    259          	 	{
+    260          	 	//LedPWM(LedNumberType eLED_,LedRateType ePwmRate_)
+    261          	 	}
+    262          	}
+   \                     ??Led_API_test_6: (+1)
+   \   00000076   0xBD01             POP      {R0,PC}          ;; return
+    263          
+    264          /*--------------------------------------------------------------------------------------------------------------------*/
+    265          /* Private functions                                                                                                  */
+    266          /*--------------------------------------------------------------------------------------------------------------------*/
+    267          //test 2017-5-6
+
+   \                                 In section .text, align 2, keep-with-next
+    268          void BCD_code_display(void)
+    269          {
    \                     BCD_code_display: (+1)
    \   00000000   0xB510             PUSH     {R4,LR}
-    133            static u16 u16_counter = 0;
-    134            static u8 a_u8_binary[8] =0;
+    270            static u16 u16_counter = 0;//this varible for counter the 1S
+    271            static u8 a_u8_binary[8] =0;//to determine what light on
                                              ^
 Warning[Pe520]: initialization with "{...}" expected for aggregate object
-    135            u8 u8_temp_counter =0;
+    272            u8 u8_temp_counter =0;//for tempoary save 
    \   00000002   0x2400             MOVS     R4,#+0
-    136            static u8 u8_temp_counter_on=0;
-    137            if(G_u32SystemTime1ms%1000==0)
-   \   00000004   0x....             LDR.N    R0,??DataTable4_1
+    273            static u8 u8_temp_counter_on=0;//for change the the decema 
+    274            if(G_u32SystemTime1ms%1000==0)
+   \   00000004   0x....             LDR.N    R0,??DataTable7_5
    \   00000006   0x6800             LDR      R0,[R0, #+0]
    \   00000008   0xF44F 0x717A      MOV      R1,#+1000
    \   0000000C   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000010   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000014   0x2800             CMP      R0,#+0
    \   00000016   0xD10B             BNE.N    ??BCD_code_display_0
-    138            {
-    139               u16_counter++;
-   \   00000018   0x....             LDR.N    R0,??DataTable4_2
+    275            {
+    276               u16_counter++;
+   \   00000018   0x....             LDR.N    R0,??DataTable7_7
    \   0000001A   0x8800             LDRH     R0,[R0, #+0]
    \   0000001C   0x1C40             ADDS     R0,R0,#+1
-   \   0000001E   0x....             LDR.N    R1,??DataTable4_2
+   \   0000001E   0x....             LDR.N    R1,??DataTable7_7
    \   00000020   0x8008             STRH     R0,[R1, #+0]
-    140          	 if(u16_counter>=99)
-   \   00000022   0x....             LDR.N    R0,??DataTable4_2
+    277          	 if(u16_counter>=99)
+   \   00000022   0x....             LDR.N    R0,??DataTable7_7
    \   00000024   0x8800             LDRH     R0,[R0, #+0]
    \   00000026   0x2863             CMP      R0,#+99
    \   00000028   0xDB02             BLT.N    ??BCD_code_display_0
-    141          	 	u16_counter=0;
+    278          	 	u16_counter=0;
    \   0000002A   0x2000             MOVS     R0,#+0
-   \   0000002C   0x....             LDR.N    R1,??DataTable4_2
+   \   0000002C   0x....             LDR.N    R1,??DataTable7_7
    \   0000002E   0x8008             STRH     R0,[R1, #+0]
-    142            }
-    143            ///decade 
-    144            u8_temp_counter_on=u16_counter/10;
+    279            }
+    280            ///decade 
+    281            u8_temp_counter_on=u16_counter/10;
    \                     ??BCD_code_display_0: (+1)
-   \   00000030   0x....             LDR.N    R0,??DataTable4_2
+   \   00000030   0x....             LDR.N    R0,??DataTable7_7
    \   00000032   0x8800             LDRH     R0,[R0, #+0]
    \   00000034   0x210A             MOVS     R1,#+10
    \   00000036   0xFB90 0xF0F1      SDIV     R0,R0,R1
-   \   0000003A   0x....             LDR.N    R1,??DataTable4_3
+   \   0000003A   0x....             LDR.N    R1,??DataTable7_8
    \   0000003C   0x7008             STRB     R0,[R1, #+0]
-    145            for(u8_temp_counter=4;u8_temp_counter<=7;u8_temp_counter++)
+    282            for(u8_temp_counter=4;u8_temp_counter<=7;u8_temp_counter++)
    \   0000003E   0x2004             MOVS     R0,#+4
    \   00000040   0x0004             MOVS     R4,R0
    \                     ??BCD_code_display_1: (+1)
    \   00000042   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   00000044   0x2C08             CMP      R4,#+8
    \   00000046   0xDA12             BGE.N    ??BCD_code_display_2
-    146            	{
-    147               a_u8_binary[u8_temp_counter] = u8_temp_counter_on%2;
-   \   00000048   0x....             LDR.N    R0,??DataTable4_3
+    283            	{
+    284               a_u8_binary[u8_temp_counter] = u8_temp_counter_on%2;
+   \   00000048   0x....             LDR.N    R0,??DataTable7_8
    \   0000004A   0x7800             LDRB     R0,[R0, #+0]
    \   0000004C   0x2102             MOVS     R1,#+2
    \   0000004E   0xFB90 0xF2F1      SDIV     R2,R0,R1
    \   00000052   0xFB02 0x0211      MLS      R2,R2,R1,R0
-   \   00000056   0x....             LDR.N    R0,??DataTable4_4
+   \   00000056   0x....             LDR.N    R0,??DataTable7_9
    \   00000058   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   0000005A   0x5422             STRB     R2,[R4, R0]
-    148          	 u8_temp_counter_on=u8_temp_counter_on/2;
-   \   0000005C   0x....             LDR.N    R0,??DataTable4_3
+    285          	 u8_temp_counter_on=u8_temp_counter_on/2;
+   \   0000005C   0x....             LDR.N    R0,??DataTable7_8
    \   0000005E   0x7800             LDRB     R0,[R0, #+0]
    \   00000060   0x2102             MOVS     R1,#+2
    \   00000062   0xFB90 0xF0F1      SDIV     R0,R0,R1
-   \   00000066   0x....             LDR.N    R1,??DataTable4_3
+   \   00000066   0x....             LDR.N    R1,??DataTable7_8
    \   00000068   0x7008             STRB     R0,[R1, #+0]
-    149            	}
+    286            	}
    \   0000006A   0x1C64             ADDS     R4,R4,#+1
    \   0000006C   0xE7E9             B.N      ??BCD_code_display_1
-    150            ///signal 
-    151            u8_temp_counter_on=u16_counter%10;
+    287            ///signal 
+    288            u8_temp_counter_on=u16_counter%10;
    \                     ??BCD_code_display_2: (+1)
-   \   0000006E   0x....             LDR.N    R0,??DataTable4_2
+   \   0000006E   0x....             LDR.N    R0,??DataTable7_7
    \   00000070   0x8800             LDRH     R0,[R0, #+0]
    \   00000072   0x210A             MOVS     R1,#+10
    \   00000074   0xFB90 0xF2F1      SDIV     R2,R0,R1
    \   00000078   0xFB01 0x0012      MLS      R0,R1,R2,R0
-   \   0000007C   0x....             LDR.N    R1,??DataTable4_3
+   \   0000007C   0x....             LDR.N    R1,??DataTable7_8
    \   0000007E   0x7008             STRB     R0,[R1, #+0]
-    152            	for(u8_temp_counter=0;u8_temp_counter<=3;u8_temp_counter++)
+    289            	for(u8_temp_counter=0;u8_temp_counter<=3;u8_temp_counter++)
    \   00000080   0x2000             MOVS     R0,#+0
    \   00000082   0x0004             MOVS     R4,R0
    \                     ??BCD_code_display_3: (+1)
    \   00000084   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   00000086   0x2C04             CMP      R4,#+4
    \   00000088   0xDA12             BGE.N    ??BCD_code_display_4
-    153            		{a_u8_binary[u8_temp_counter]=u8_temp_counter_on%2;
-   \   0000008A   0x....             LDR.N    R0,??DataTable4_3
+    290            		{a_u8_binary[u8_temp_counter]=u8_temp_counter_on%2;
+   \   0000008A   0x....             LDR.N    R0,??DataTable7_8
    \   0000008C   0x7800             LDRB     R0,[R0, #+0]
    \   0000008E   0x2102             MOVS     R1,#+2
    \   00000090   0xFB90 0xF2F1      SDIV     R2,R0,R1
    \   00000094   0xFB02 0x0211      MLS      R2,R2,R1,R0
-   \   00000098   0x....             LDR.N    R0,??DataTable4_4
+   \   00000098   0x....             LDR.N    R0,??DataTable7_9
    \   0000009A   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   0000009C   0x5422             STRB     R2,[R4, R0]
-    154          	     u8_temp_counter_on=u8_temp_counter_on/2;
-   \   0000009E   0x....             LDR.N    R0,??DataTable4_3
+    291          	     u8_temp_counter_on=u8_temp_counter_on/2;
+   \   0000009E   0x....             LDR.N    R0,??DataTable7_8
    \   000000A0   0x7800             LDRB     R0,[R0, #+0]
    \   000000A2   0x2102             MOVS     R1,#+2
    \   000000A4   0xFB90 0xF0F1      SDIV     R0,R0,R1
-   \   000000A8   0x....             LDR.N    R1,??DataTable4_3
+   \   000000A8   0x....             LDR.N    R1,??DataTable7_8
    \   000000AA   0x7008             STRB     R0,[R1, #+0]
-    155            		}
+    292            		}
    \   000000AC   0x1C64             ADDS     R4,R4,#+1
    \   000000AE   0xE7E9             B.N      ??BCD_code_display_3
-    156          	for(u8_temp_counter=0;u8_temp_counter<=7;u8_temp_counter++)
+    293          	for(u8_temp_counter=0;u8_temp_counter<=7;u8_temp_counter++)
    \                     ??BCD_code_display_4: (+1)
    \   000000B0   0x2000             MOVS     R0,#+0
    \   000000B2   0x0004             MOVS     R4,R0
@@ -315,36 +713,36 @@ Warning[Pe520]: initialization with "{...}" expected for aggregate object
    \   000000B4   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   000000B6   0x2C08             CMP      R4,#+8
    \   000000B8   0xDA0F             BGE.N    ??BCD_code_display_6
-    157          		{
-    158          		 if(a_u8_binary[u8_temp_counter]==1)
-   \   000000BA   0x....             LDR.N    R0,??DataTable4_4
+    294          		{
+    295          		 if(a_u8_binary[u8_temp_counter]==1)
+   \   000000BA   0x....             LDR.N    R0,??DataTable7_9
    \   000000BC   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   000000BE   0x5C20             LDRB     R0,[R4, R0]
    \   000000C0   0x2801             CMP      R0,#+1
    \   000000C2   0xD104             BNE.N    ??BCD_code_display_7
-    159          		 	LedOn(u8_temp_counter);
+    296          		 	LedOn(u8_temp_counter);
                  		 	      ^
 Warning[Pe188]: enumerated type mixed with another type
    \   000000C4   0x0020             MOVS     R0,R4
    \   000000C6   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   000000C8   0x.... 0x....      BL       LedOn
    \   000000CC   0xE003             B.N      ??BCD_code_display_8
-    160          		 else
-    161          		 	LedOff(u8_temp_counter);
+    297          		 else
+    298          		 	LedOff(u8_temp_counter);
                  		 	       ^
 Warning[Pe188]: enumerated type mixed with another type
    \                     ??BCD_code_display_7: (+1)
    \   000000CE   0x0020             MOVS     R0,R4
    \   000000D0   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   000000D2   0x.... 0x....      BL       LedOff
-    162          		}
+    299          		}
    \                     ??BCD_code_display_8: (+1)
    \   000000D6   0x1C64             ADDS     R4,R4,#+1
    \   000000D8   0xE7EC             B.N      ??BCD_code_display_5
-    163          
-    164          	
-    165            
-    166          }
+    300          
+    301          	
+    302            
+    303          }
    \                     ??BCD_code_display_6: (+1)
    \   000000DA   0xBD10             POP      {R4,PC}          ;; return
 
@@ -359,63 +757,63 @@ Warning[Pe188]: enumerated type mixed with another type
    \                                 In section .bss, align 1
    \                     ??u8_temp_counter_on:
    \   00000000                      DS8 1
-    167          
-    168          /**********************************************************************************************************************
-    169          State Machine Function Definitions
-    170          **********************************************************************************************************************/
-    171          
-    172          //
+    304          
+    305          /**********************************************************************************************************************
+    306          State Machine Function Definitions
+    307          **********************************************************************************************************************/
+    308          
+    309          //
 
    \                                 In section .text, align 2, keep-with-next
-    173          void double_led(void)
-    174          {
+    310          void double_led(void)
+    311          {
    \                     double_led: (+1)
    \   00000000   0xB510             PUSH     {R4,LR}
-    175            u8 u8_counter = 0;
+    312            u8 u8_counter = 0;
    \   00000002   0x2400             MOVS     R4,#+0
-    176            if(G_u32SystemTime1ms%500==0)
-   \   00000004   0x....             LDR.N    R0,??DataTable4_1
+    313            if(G_u32SystemTime1ms%500==0)
+   \   00000004   0x....             LDR.N    R0,??DataTable7_5
    \   00000006   0x6800             LDR      R0,[R0, #+0]
    \   00000008   0xF44F 0x71FA      MOV      R1,#+500
    \   0000000C   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000010   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000014   0x2800             CMP      R0,#+0
    \   00000016   0xD10A             BNE.N    ??double_led_0
-    177              for(u8_counter=0;u8_counter<=4;u8_counter++)
+    314              for(u8_counter=0;u8_counter<=4;u8_counter++)
    \   00000018   0x2000             MOVS     R0,#+0
    \   0000001A   0x0004             MOVS     R4,R0
    \                     ??double_led_1: (+1)
    \   0000001C   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   0000001E   0x2C05             CMP      R4,#+5
    \   00000020   0xDA05             BGE.N    ??double_led_0
-    178              {
-    179                LedOn(u8_counter+2);
+    315              {
+    316                LedOn(u8_counter+2);
                              ^
 Warning[Pe188]: enumerated type mixed with another type
    \   00000022   0x1CA0             ADDS     R0,R4,#+2
    \   00000024   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   00000026   0x.... 0x....      BL       LedOn
-    180              }
+    317              }
    \   0000002A   0x1C64             ADDS     R4,R4,#+1
    \   0000002C   0xE7F6             B.N      ??double_led_1
-    181            if(G_u32SystemTime1ms%2000==0)
+    318            if(G_u32SystemTime1ms%2000==0)
    \                     ??double_led_0: (+1)
-   \   0000002E   0x....             LDR.N    R0,??DataTable4_1
+   \   0000002E   0x....             LDR.N    R0,??DataTable7_5
    \   00000030   0x6800             LDR      R0,[R0, #+0]
    \   00000032   0xF44F 0x61FA      MOV      R1,#+2000
    \   00000036   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   0000003A   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   0000003E   0x2800             CMP      R0,#+0
    \   00000040   0xD10A             BNE.N    ??double_led_2
-    182            {
-    183               for(u8_counter=0;u8_counter<=7;u8_counter++)
+    319            {
+    320               for(u8_counter=0;u8_counter<=7;u8_counter++)
    \   00000042   0x2000             MOVS     R0,#+0
    \   00000044   0x0004             MOVS     R4,R0
    \                     ??double_led_3: (+1)
    \   00000046   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   00000048   0x2C08             CMP      R4,#+8
    \   0000004A   0xDA05             BGE.N    ??double_led_2
-    184                 LedOff(u8_counter);
+    321                 LedOff(u8_counter);
                                ^
 Warning[Pe188]: enumerated type mixed with another type
    \   0000004C   0x0020             MOVS     R0,R4
@@ -423,164 +821,204 @@ Warning[Pe188]: enumerated type mixed with another type
    \   00000050   0x.... 0x....      BL       LedOff
    \   00000054   0x1C64             ADDS     R4,R4,#+1
    \   00000056   0xE7F6             B.N      ??double_led_3
-    185            }
-    186            if(G_u32SystemTime1ms%10000==0)
+    322            }
+    323            if(G_u32SystemTime1ms%10000==0)
    \                     ??double_led_2: (+1)
-   \   00000058   0x....             LDR.N    R0,??DataTable4_1
+   \   00000058   0x....             LDR.N    R0,??DataTable7_5
    \   0000005A   0x6800             LDR      R0,[R0, #+0]
    \   0000005C   0xF242 0x7110      MOVW     R1,#+10000
    \   00000060   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000064   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000068   0x2800             CMP      R0,#+0
    \   0000006A   0xD103             BNE.N    ??double_led_4
-    187                UserApp1_StateMachine = all_led;
+    324                UserApp1_StateMachine = all_led;
    \   0000006C   0x.... 0x....      ADR.W    R0,all_led
-   \   00000070   0x....             LDR.N    R1,??DataTable4
+   \   00000070   0x....             LDR.N    R1,??DataTable7
    \   00000072   0x6008             STR      R0,[R1, #+0]
-    188              
-    189              
-    190          }
+    325              
+    326              
+    327          }
    \                     ??double_led_4: (+1)
    \   00000074   0xBD10             POP      {R4,PC}          ;; return
-    191          
-    192          //all led light.
+    328          
+    329          //all led light.
 
    \                                 In section .text, align 4, keep-with-next
-    193          void all_led(void)
-    194          {u8 u8_counter=0;
+    330          void all_led(void)
+    331          {u8 u8_counter=0;
    \                     all_led: (+1)
    \   00000000   0xB510             PUSH     {R4,LR}
    \   00000002   0x2400             MOVS     R4,#+0
-    195              if(G_u32SystemTime1ms%1000==0)
-   \   00000004   0x....             LDR.N    R0,??DataTable4_1
+    332              if(G_u32SystemTime1ms%1000==0)
+   \   00000004   0x....             LDR.N    R0,??DataTable7_5
    \   00000006   0x6800             LDR      R0,[R0, #+0]
    \   00000008   0xF44F 0x717A      MOV      R1,#+1000
    \   0000000C   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000010   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000014   0x2800             CMP      R0,#+0
    \   00000016   0xD10A             BNE.N    ??all_led_0
-    196              {
-    197               for(u8_counter=0;u8_counter<=7;u8_counter++)
+    333              {
+    334               for(u8_counter=0;u8_counter<=7;u8_counter++)
    \   00000018   0x2000             MOVS     R0,#+0
    \   0000001A   0x0004             MOVS     R4,R0
    \                     ??all_led_1: (+1)
    \   0000001C   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   0000001E   0x2C08             CMP      R4,#+8
    \   00000020   0xDA05             BGE.N    ??all_led_0
-    198               {
-    199                 LedOn(u8_counter);
+    335               {
+    336                 LedOn(u8_counter);
                               ^
 Warning[Pe188]: enumerated type mixed with another type
    \   00000022   0x0020             MOVS     R0,R4
    \   00000024   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   00000026   0x.... 0x....      BL       LedOn
-    200                //LedOn(RED);
-    201               }
+    337                //LedOn(RED);
+    338               }
    \   0000002A   0x1C64             ADDS     R4,R4,#+1
    \   0000002C   0xE7F6             B.N      ??all_led_1
-    202              }
-    203              if(G_u32SystemTime1ms%2000==0)
+    339              }
+    340              if(G_u32SystemTime1ms%2000==0)
    \                     ??all_led_0: (+1)
-   \   0000002E   0x....             LDR.N    R0,??DataTable4_1
+   \   0000002E   0x....             LDR.N    R0,??DataTable7_5
    \   00000030   0x6800             LDR      R0,[R0, #+0]
    \   00000032   0xF44F 0x61FA      MOV      R1,#+2000
    \   00000036   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   0000003A   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   0000003E   0x2800             CMP      R0,#+0
    \   00000040   0xD10A             BNE.N    ??all_led_2
-    204              {
-    205                for(u8_counter=0;u8_counter<=7;u8_counter++)
+    341              {
+    342                for(u8_counter=0;u8_counter<=7;u8_counter++)
    \   00000042   0x2000             MOVS     R0,#+0
    \   00000044   0x0004             MOVS     R4,R0
    \                     ??all_led_3: (+1)
    \   00000046   0xB2E4             UXTB     R4,R4            ;; ZeroExt  R4,R4,#+24,#+24
    \   00000048   0x2C08             CMP      R4,#+8
    \   0000004A   0xDA05             BGE.N    ??all_led_2
-    206                {
-    207                  LedOff(u8_counter);
+    343                {
+    344                  LedOff(u8_counter);
                                 ^
 Warning[Pe188]: enumerated type mixed with another type
    \   0000004C   0x0020             MOVS     R0,R4
    \   0000004E   0xB2C0             UXTB     R0,R0            ;; ZeroExt  R0,R0,#+24,#+24
    \   00000050   0x.... 0x....      BL       LedOff
-    208                }
+    345                }
    \   00000054   0x1C64             ADDS     R4,R4,#+1
    \   00000056   0xE7F6             B.N      ??all_led_3
-    209              }
-    210              if(G_u32SystemTime1ms%10000==0)//10
+    346              }
+    347              if(G_u32SystemTime1ms%10000==0)//10
    \                     ??all_led_2: (+1)
-   \   00000058   0x....             LDR.N    R0,??DataTable4_1
+   \   00000058   0x....             LDR.N    R0,??DataTable7_5
    \   0000005A   0x6800             LDR      R0,[R0, #+0]
    \   0000005C   0xF242 0x7110      MOVW     R1,#+10000
    \   00000060   0xFBB0 0xF2F1      UDIV     R2,R0,R1
    \   00000064   0xFB01 0x0012      MLS      R0,R1,R2,R0
    \   00000068   0x2800             CMP      R0,#+0
    \   0000006A   0xD102             BNE.N    ??all_led_4
-    211                UserApp1_StateMachine = double_led;
-   \   0000006C   0x....             LDR.N    R0,??DataTable4_5
-   \   0000006E   0x....             LDR.N    R1,??DataTable4
+    348                UserApp1_StateMachine = double_led;
+   \   0000006C   0x....             LDR.N    R0,??DataTable7_10
+   \   0000006E   0x....             LDR.N    R1,??DataTable7
    \   00000070   0x6008             STR      R0,[R1, #+0]
-    212             
-    213              
-    214                
-    215          }
+    349             
+    350              
+    351                
+    352          }
    \                     ??all_led_4: (+1)
    \   00000072   0xBD10             POP      {R4,PC}          ;; return
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable4:
+   \                     ??DataTable7:
    \   00000000   0x........         DC32     UserApp1_StateMachine
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable4_1:
+   \                     ??DataTable7_1:
+   \   00000000   0x........         DC32     ??u8_counter_buttton_press
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable7_2:
+   \   00000000   0x........         DC32     ??u8_input_button
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable7_3:
+   \   00000000   0x........         DC32     ??u8_password
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable7_4:
+   \   00000000   0x........         DC32     ??B_Pass_No
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable7_5:
    \   00000000   0x........         DC32     G_u32SystemTime1ms
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable4_2:
+   \                     ??DataTable7_6:
+   \   00000000   0x........         DC32     ??B_ispressed
+
+   \                                 In section .text, align 4, keep-with-next
+   \                     ??DataTable7_7:
    \   00000000   0x........         DC32     ??u16_counter
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable4_3:
+   \                     ??DataTable7_8:
    \   00000000   0x........         DC32     ??u8_temp_counter_on
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable4_4:
+   \                     ??DataTable7_9:
    \   00000000   0x........         DC32     ??a_u8_binary
 
    \                                 In section .text, align 4, keep-with-next
-   \                     ??DataTable4_5:
+   \                     ??DataTable7_10:
    \   00000000   0x........         DC32     double_led
-    216          ///
-    217          /*-------------------------------------------------------------------------------------------------------------------*/
-    218          /* Wait for ??? */
-    219          static void UserApp1SM_Idle(void)
-                             ^
-Warning[Pe177]: function "UserApp1SM_Idle" was declared but never referenced
-    220          {
-    221          
-    222          } /* end UserApp1SM_Idle() */
-    223              
-    224          #if 0
-    225          /*-------------------------------------------------------------------------------------------------------------------*/
-    226          /* Handle an error */
-    227          static void UserApp1SM_Error(void)          
-    228          {
-    229            
-    230          } /* end UserApp1SM_Error() */
-    231          #endif
-    232          
-    233          
-    234          /*-------------------------------------------------------------------------------------------------------------------*/
-    235          /* State to sit in if init failed */
-    236          static void UserApp1SM_FailedInit(void)          
-    237          {
-    238              
-    239          } /* end UserApp1SM_FailedInit() */
-    240          
-    241          
-    242          /*--------------------------------------------------------------------------------------------------------------------*/
-    243          /* End of File                                                                                                        */
-    244          /*--------------------------------------------------------------------------------------------------------------------*/
+
+   \                                 In section .rodata, align 4
+   \   00000000   0x00 0x00          DC8 0, 0, 0, 0
+   \              0x00 0x00    
+    353          ///
+    354          /*-------------------------------------------------------------------------------------------------------------------*/
+    355          /* Wait for ??? */
+    356          static void UserApp1SM_Idle(void)
+    357          {
+    358          static u8 u8_pwm_red = 0;
+    359           if(G_u32SystemTime1ms%1000==0)//blink purple
+    360           	{
+    361           	LedToggle(PURPLE);
+    362          	u8_pwm_red++;
+    363          	if(u8_pwm_red>=20)
+    364          		u8_pwm_red=0;
+    365          
+    366          	LedPWM(RED,u8_pwm_red);
+                 	           ^
+Warning[Pe188]: enumerated type mixed with another type
+
+  static void UserApp1SM_Idle(void)
+              ^
+"D:\Documents\GitHub\5-5eie\5_course\firmware_mpg_common\application\user_app1.c",356  Warning[Pe177]: 
+          function "UserApp1SM_Idle" was declared but never referenced
+    367           	}
+    368           
+    369           
+    370          } /* end UserApp1SM_Idle() */
+    371              
+    372          #if 0
+    373          /*-------------------------------------------------------------------------------------------------------------------*/
+    374          /* Handle an error */
+    375          static void UserApp1SM_Error(void)          
+    376          {
+    377            
+    378          } /* end UserApp1SM_Error() */
+    379          #endif
+    380          
+    381          
+    382          /*-------------------------------------------------------------------------------------------------------------------*/
+    383          /* State to sit in if init failed */
+    384          static void UserApp1SM_FailedInit(void)          
+    385          {
+    386              
+    387          } /* end UserApp1SM_FailedInit() */
+    388          
+    389          
+    390          /*--------------------------------------------------------------------------------------------------------------------*/
+    391          /* End of File                                                                                                        */
+    392          /*--------------------------------------------------------------------------------------------------------------------*/
 
    Maximum stack usage in bytes:
 
@@ -589,44 +1027,77 @@ Warning[Pe177]: function "UserApp1SM_Idle" was declared but never referenced
        8   BCD_code_display
          8   -> LedOff
          8   -> LedOn
-       0   UserApp1Initialize
+       8   Led_API_test
+         8   -> ButtonAcknowledge
+         8   -> LedToggle
+         8   -> WasButtonPressed
+       8   UserApp1Initialize
+         8   -> LedOff
        8   UserApp1RunActiveState
          8   -- Indirect call
        8   all_led
          8   -> LedOff
          8   -> LedOn
+       8   button_pressed
+         8   -> ButtonAcknowledge
+         8   -> IsButtonPressed
+         8   -> LedOff
+         8   -> LedOn
+         8   -> WasButtonPressed
        8   double_led
          8   -> LedOff
          8   -> LedOn
+       8   password_button
+         8   -> ButtonAcknowledge
+         8   -> LedOn
+         8   -> LedToggle
+         8   -> WasButtonPressed
 
 
    Section sizes:
 
    Bytes  Function/Label
    -----  --------------
-       4  ??DataTable4
-       4  ??DataTable4_1
-       4  ??DataTable4_2
-       4  ??DataTable4_3
-       4  ??DataTable4_4
-       4  ??DataTable4_5
+       4  ??DataTable7
+       4  ??DataTable7_1
+       4  ??DataTable7_10
+       4  ??DataTable7_2
+       4  ??DataTable7_3
+       4  ??DataTable7_4
+       4  ??DataTable7_5
+       4  ??DataTable7_6
+       4  ??DataTable7_7
+       4  ??DataTable7_8
+       4  ??DataTable7_9
+       4  ?_0
      220  BCD_code_display
+       4  B_Pass_No
+       4  B_ispressed
        4  G_u32UserApp1Flags
-      10  UserApp1Initialize
-      10  UserApp1RunActiveState
+     120  Led_API_test
+      38  UserApp1Initialize
+      12  UserApp1RunActiveState
        4  UserApp1_StateMachine
        8  a_u8_binary
      116  all_led
+      98  button_pressed
      118  double_led
+     266  password_button
        2  u16_counter
+       1  u8_counter_buttton_press
+       4  u8_input_button
+       4  u8_password
        1  u8_temp_counter_on
 
  
-  19 bytes in section .bss
- 498 bytes in section .text
+    32 bytes in section .bss
+     4 bytes in section .data
+     4 bytes in section .rodata
+ 1 032 bytes in section .text
  
- 498 bytes of CODE memory
-  19 bytes of DATA memory
+ 1 032 bytes of CODE  memory
+     4 bytes of CONST memory
+    36 bytes of DATA  memory
 
 Errors: none
-Warnings: 8
+Warnings: 12
