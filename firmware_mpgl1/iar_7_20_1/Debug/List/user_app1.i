@@ -18149,9 +18149,12 @@ void password_button(void)
 	 u8 u8_temp_number     =0;
 	 if(u8_counter_buttton_press<=3)//you can input the password
 		 	{
+		 	B_Pass_No[0] = FALSE;//initation the logic parameter
+		 	
 		 if(WasButtonPressed((u32)0))
 		 	{
 		 	  u8_input_button[u8_counter_buttton_press]=0;
+			  LedOn(WHITE);
 		 	  
 		 	  ButtonAcknowledge((u32)0);
 			  u8_counter_buttton_press++;
@@ -18176,7 +18179,7 @@ void password_button(void)
 			  u8_counter_buttton_press++;
 		 	}
 	 	}
-	 if(u8_counter_buttton_press==3)//stop input password
+	 if(u8_counter_buttton_press==4)//stop input password
 	 	LedOn(RED);
 	// for(u8_temp_number=0;u8_temp_number<=3;u8_temp_number++)
 	 	//{
@@ -18197,6 +18200,7 @@ void password_button(void)
    	{
    	    if(G_u32SystemTime1ms%1000==0)
 			LedToggle(BLUE);
+		u8_counter_buttton_press=0;// start new input 
    	}
 	 
 }
@@ -18376,7 +18380,7 @@ static u8 u8_pwm_red = 0;
  
 } /* end UserApp1SM_Idle() */
     
-#line 380 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\application\\user_app1.c"
+#line 384 "D:\\Documents\\GitHub\\5-5eie\\5_course\\firmware_mpg_common\\application\\user_app1.c"
 
 
 /*-------------------------------------------------------------------------------------------------------------------*/

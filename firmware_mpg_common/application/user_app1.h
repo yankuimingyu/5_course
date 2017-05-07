@@ -65,6 +65,7 @@ void BCD_code_display(void);
 void Led_API_test(void);
 void button_pressed(void);
 void password_button(void);
+void Eie_classmate_work(void);
 
 
 #endif /* __USER_APP1_H */

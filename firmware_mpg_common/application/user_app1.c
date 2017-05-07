@@ -142,9 +142,12 @@ void password_button(void)
 	 u8 u8_temp_number     =0;
 	 if(u8_counter_buttton_press<=3)//you can input the password
 		 	{
+		 	B_Pass_No[0] = FALSE;//initation the logic parameter
+		 	
 		 if(WasButtonPressed(BUTTON0))
 		 	{
 		 	  u8_input_button[u8_counter_buttton_press]=0;
+			  LedOn(WHITE);
 		 	  
 		 	  ButtonAcknowledge(BUTTON0);
 			  u8_counter_buttton_press++;
@@ -169,7 +172,7 @@ void password_button(void)
 			  u8_counter_buttton_press++;
 		 	}
 	 	}
-	 if(u8_counter_buttton_press==3)//stop input password
+	 if(u8_counter_buttton_press==4)//stop input password
 	 	LedOn(RED);
 	// for(u8_temp_number=0;u8_temp_number<=3;u8_temp_number++)
 	 	//{
@@ -190,10 +193,41 @@ void password_button(void)
    	{
    	    if(G_u32SystemTime1ms%1000==0)
 			LedToggle(BLUE);
+		u8_counter_buttton_press=0;// start new input 
    	}
 	 
 }
 //
+void Eie_classmate_work()
+{
+
+   static  u32 u32counter=0;
+        u32 u32randvalue;
+        u8  u8value=0;
+        u8  u8counter=0;
+         u32counter++;
+         if(u32counter<500){
+            return; 
+         }
+         u32counter=0;
+         u32randvalue=rand();
+         u8value=0;
+         for(u8counter=0;u8counter<4;u8counter++){
+           
+             u8value+=(u32randvalue&0x000000ff);
+             u32randvalue>>=8;
+           
+         }
+         u8value&=0x0f;
+         if(u8value>7){
+            u8value-=8; 
+         }
+         for(u8counter=0;u8counter<8;u8counter++)
+         {
+           LedOff(u8counter);
+          }
+   
+}
 void button_pressed(void)
 { 
   static bool B_ispressed[3] = FALSE;
