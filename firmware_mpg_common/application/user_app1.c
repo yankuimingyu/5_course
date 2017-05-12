@@ -35,7 +35,11 @@ Runs current task state.  Should only be called once in main loop.
 **********************************************************************************************************************/
 
 #include "configuration.h"
-
+///
+#define ledpart_one  1
+#define ledpart_two  2
+#define ledpart_three 3
+///
 /***********************************************************************************************************************
 Global variable definitions with scope across entire project.
 All Global variable names shall start with "G_UserApp1"
@@ -43,7 +47,8 @@ All Global variable names shall start with "G_UserApp1"
 /* New variables */
 volatile u32 G_u32UserApp1Flags;                       /* Global state flags */
 
-
+extern u8 G_au8DebugScanfBuffer[];
+extern u8 G_u8DebugScanfCharCount;
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
 extern volatile u32 G_u32SystemFlags;                  /* From main.c */
@@ -91,6 +96,8 @@ void UserApp1Initialize(void)
 	LedOff(YELLOW);
 	LedOff(RED);
 	LedOff(PURPLE);
+	PWMAudioOff(BUZZER1);
+	PWMAudioSetFrequency(BUZZER1,500);
 /*
  LedOn(BLUE);
  LedToggle(PURPLE);
@@ -101,7 +108,7 @@ void UserApp1Initialize(void)
   if( 1 )
   {
    // UserApp1_StateMachine = UserApp1SM_Idle;
-   UserApp1_StateMachine =   password_button;
+   UserApp1_StateMachine =    Lcd_display;
      //UserApp1_StateMachine =BCD_code_display;
   }
   else
@@ -132,71 +139,759 @@ void UserApp1RunActiveState(void)
   UserApp1_StateMachine();
 
 } /* end UserApp1RunActiveState */
+//***
 //
-void password_button(void)
-{  
-     static u8 u8_password[4]={0,2,3,1};
-	 static u8 u8_input_button[4]={0};
-	 static  u8 u8_counter_buttton_press=0;
-	 static  BOOL B_Pass_No[3]= FALSE;
-	 u8 u8_temp_number     =0;
-	 if(u8_counter_buttton_press<=3)//you can input the password
-		 	{
-		 	B_Pass_No[0] = FALSE;//initation the logic parameter
-		 	
-		 if(WasButtonPressed(BUTTON0))
-		 	{
-		 	  u8_input_button[u8_counter_buttton_press]=0;
-			  LedOn(WHITE);
-		 	  
-		 	  ButtonAcknowledge(BUTTON0);
-			  u8_counter_buttton_press++;
-		 	}
-
-		 if(WasButtonPressed(BUTTON1))
-		 	{
-		 	 u8_input_button[u8_counter_buttton_press]=1;
-			 ButtonAcknowledge(BUTTON1);
-			 u8_counter_buttton_press++;
-		 	}
-		 if(WasButtonPressed(BUTTON2))
-		 	{
-		 	u8_input_button[u8_counter_buttton_press]=2;
-			ButtonAcknowledge(BUTTON2);
-			u8_counter_buttton_press++;
-		 	}
-		 if(WasButtonPressed(BUTTON3))
-		 	{
-		 	  u8_input_button[u8_counter_buttton_press]=3;
-			  	ButtonAcknowledge(BUTTON3);
-			  u8_counter_buttton_press++;
-		 	}
-	 	}
-	 if(u8_counter_buttton_press==4)//stop input password
-	 	LedOn(RED);
-	// for(u8_temp_number=0;u8_temp_number<=3;u8_temp_number++)
-	 	//{
-	 	do{
-	 	  if(u8_password[u8_temp_number]==u8_input_button[u8_temp_number])
-		  	{u8_temp_number++;
-		     B_Pass_No[0]= TRUE;
-	 	  	}
-		  else
-		  	{
-		  	  B_Pass_No[0]=FALSE;
-			  break;
-		  	}
-		  	
-	      } 	
-		 while(u8_temp_number<=3);//}
-   if(B_Pass_No[0]==TRUE)
-   	{
-   	    if(G_u32SystemTime1ms%1000==0)
-			LedToggle(BLUE);
-		u8_counter_buttton_press=0;// start new input 
+//
+void Lcd_display(void)
+{
+   static u8* u8_string= "Hello world!";//数组和指针是一样
+   u8 u8_len      = 0;
+   u8_len         = strlen(u8_string);
+   static u8 u8_counter =0;
+   if(G_u32SystemTime1ms%300==0)///
+   	{ 
+   	  //LCDCommand(LCD_CLEAR_CMD);//可以显示刷新
+   	  LCDClearChars(LINE1_START_ADDR,u8_counter);
+   	  LCDMessage(LINE1_START_ADDR+u8_counter,u8_string);
+	  u8_counter++;
+	  if((u8_counter+u8_len)>=40)
+	  	u8_counter =0;
    	}
-	 
+   if(WasButtonPressed(BUTTON0))
+   	{
+   	   ButtonAcknowledge(BUTTON0);
+	   u8_string = G_au8DebugScanfBuffer;
+   	}
 }
+void Buzzled_song(void)
+{
+  static u8 u8_count_next =0;
+  static BOOL B_off_buzzel=FALSE;
+   u8 u8_songs[] =
+   	{1,1,1,1,2,2,2,2,3,3,3,3,1,1,1,1,
+   	 1,1,1,1,2,2,2,2,3,3,3,3,1,1,1,1,
+   	 3,3,3,3,4,4,4,4,5,5,5,5,5,5,5,5,
+   	 3,3,3,3,4,4,4,4,5,5,5,5,5,5,5,5,
+   	 5,5,6,5,5,4,3,3,3,3,1,1,1,1,
+   	 5,5,6,5,5,4,3,3,3,3,1,1,1,1,
+   	 1,1,1,1,1,5,5,5,5,1,1,1,1,1,1,1,
+   	 1,1,1,1,1,5,5,5,5,1,1,1,1,1,1,1,0
+   	};
+  // if(u8_songs[u8_count_next]!=0)
+   	
+   	  switch (u8_songs[u8_count_next])
+   	  	{
+   	  	  case 1:
+		  	PWMAudioSetFrequency(BUZZER1,131);
+				PWMAudioSetFrequency(BUZZER2,145);
+				PWMAudioSetFrequency(BUZZER2,131);
+				
+		  	break;
+		  case 2:
+		  	PWMAudioSetFrequency(BUZZER1,147);
+			PWMAudioSetFrequency(BUZZER2,160);
+			PWMAudioSetFrequency(BUZZER2,147);
+			
+		  	break;
+		  case 3:
+		  	PWMAudioSetFrequency(BUZZER1,165);
+			PWMAudioSetFrequency(BUZZER2,170);
+			PWMAudioSetFrequency(BUZZER2,165);;
+			
+		  	break;
+		  case 4:
+		  	PWMAudioSetFrequency(BUZZER1,175);
+			PWMAudioSetFrequency(BUZZER2,190);
+			PWMAudioSetFrequency(BUZZER2,175);
+			
+		  	break;
+          case 5:
+		  	PWMAudioSetFrequency(BUZZER1,196);
+			PWMAudioSetFrequency(BUZZER2,196);
+			
+			
+		  	break;
+		  case 0:
+		  	u8_count_next =0;
+		  	break;
+		  	
+		  }
+	  if(B_off_buzzel == TRUE)
+	  	{
+		  if(G_u32SystemTime1ms%100==0)
+		  	{
+		  	 u8_count_next++;
+			 LedToggle(LCD_GREEN);
+			 // LedToggle(LCD_RED);
+			   LedToggle(LCD_BLUE);
+			 for(u8 u8_temp_1=0;u8_temp_1<=7;u8_temp_1++)
+			 	{
+			 	LedOff(u8_temp_1);
+			 	}
+			 for(u8 u8_temp_2=0;u8_temp_2<=u8_songs[u8_count_next];u8_temp_2++)
+			 	
+			 	LedOn(u8_temp_2);
+			 DebugPrintf("your tone:\r\n");
+				DebugPrintNumber(u8_songs[u8_count_next]);
+				DebugPrintf("\r\n");
+		  	}
+	  }
+	  if(WasButtonPressed(BUTTON0))
+	  	{
+		  	ButtonAcknowledge(BUTTON0);
+			if(B_off_buzzel==FALSE)
+				{
+				u8_count_next=0;
+				PWMAudioOn(BUZZER1);
+				PWMAudioOn(BUZZER2);
+				B_off_buzzel = TRUE;
+				}
+			else
+				{B_off_buzzel =FALSE;
+
+				PWMAudioOff(BUZZER1);
+				PWMAudioOff(BUZZER2);
+			}
+	  	}
+	  
+}
+//
+void Debug_serial_port(void)
+{   u8 u8_temp = 0;
+    static u8 u8_temp_counter=0;
+	static u8 u8_temp_counter1=0;
+	static u8 u8_temp_bit     =0;
+    u8 u8_name[] ="yankui";
+	static u8 u8_bit_set      =0;
+	u8 u8_character[] = "*********";
+    u8 string_u8[]="\n\rCharacters in buffer: ";
+	static u8 u8NumCharsMessage[] = "\n\rCharacters in buffer: ";
+	static bool send_port = FALSE;
+	if(WasButtonPressed(BUTTON0))
+		{ButtonAcknowledge(BUTTON0);
+	     DebugPrintf(string_u8);
+		 DebugLineFeed();
+		   if(send_port == FALSE)
+		   	send_port= TRUE;
+		   else 
+		   	send_port= FALSE;
+		  }
+        
+  
+  /* Print message with number of characters in scanf buffer */
+  if(WasButtonPressed(BUTTON3))
+  {
+	   ButtonAcknowledge(BUTTON3);
+	   
+	    u8_temp_counter1=0;//重新计算
+	   /* DebugPrintf(u8NumCharsMessage);//为什么多一个0.
+	    DebugPrintNumber(G_u8DebugScanfCharCount);
+	    DebugLineFeed();
+		DebugPrintf("\r\n***");
+		DebugPrintf("\r\n");
+		//DebugPrintf(G_au8DebugScanfBuffer);
+		//G_au8DebugScanfBuffer[]={};*/
+	 // }
+	  for(u8_temp=0;u8_temp<=G_u8DebugScanfCharCount;u8_temp++)
+	  	{ 
+	          //if(G_au8DebugScanfBuffer[u8_temp]== 'y')
+	          { 
+	            if(G_au8DebugScanfBuffer[u8_temp]== u8_name[u8_temp_counter])
+	          	{
+	          	u8_temp_counter++;
+					if(u8_temp_counter>=6)
+						{
+						u8_temp_counter = 0;
+						u8_temp_counter1++;
+						}
+	          	  
+	          	  //send_port= TRUE;
+	          	}
+	          }
+			  	///again back
+	  	}
+  	}
+  if(WasButtonPressed(BUTTON2))
+	  	{
+	  	   DebugPrintf("\r\n***\r\n");
+			ButtonAcknowledge(BUTTON2);
+			DebugPrintNumber(u8_temp_counter1);
+			DebugPrintf("\r\n***");
+			DebugPrintf("\r\n");
+			DebugPrintf("your name:\r\n");
+			//DebugPrintf(u8_name);
+			DebugPrintf("******\r\n");
+			//DebugPrintf(G_au8DebugScanfBuffer);
+	  	}
+  if(WasButtonPressed(BUTTON1))
+	  	{
+		  	ButtonAcknowledge(BUTTON1);
+		  	for(u8_temp_counter=0;u8_temp_counter<=4;u8_temp_counter++)
+			  	{
+			  	  if(u8_temp_counter1%(10^u8_temp_counter)==0)//求出多少位
+				  	continue;
+				  else
+				  	u8_bit_set++;  
+			  	}
+		  	
+		  	 for(u8_temp_counter=0;u8_temp_counter<=u8_bit_set;u8_temp_counter++)
+		  	 	{
+		  	 	   u8_character[u8_temp_counter]='*';
+		  	 	}
+	                   DebugPrintf("\r\n");
+		  	   DebugPrintf(u8_character);
+			   DebugPrintf("\r\n");
+			   DebugPrintf("*");
+			   DebugPrintNumber(u8_temp_counter1);
+			   DebugPrintf("*");
+			   DebugPrintf("\r\n");
+	                   
+	                  DebugPrintf(u8_character);
+	                  DebugPrintf("\r\n");
+				//DebugPrintf(G_au8DebugScanfBuffer);
+	  	}
+	//DebugLineFeed();//this is what useful?
+}
+//
+//to complete the code to scord 
+void led_display_rat(void)
+{
+     static u32 u32_led_counter = 0;
+	 
+	 static BOOL B_BUTTON_PUSHE = FALSE;
+	 static u8 tmep_led =0;
+	 static BOOL b_led_display  = FALSE;
+	 static u8  u8_temp_number  = 0;
+	 static u8  u8_mode_case    = 0;
+	 switch (u8_mode_case)
+	 		{
+				case 0 ://ready
+				if(WasButtonPressed(BUTTON3))
+					{
+					ButtonAcknowledge(BUTTON3);
+					u8_mode_case = 1;//to begin mode
+					}
+				break;
+				case 1:
+					if(G_u32SystemTime1ms%500==0)
+						{
+						LedOn(RED);
+							}
+					else if(G_u32SystemTime1ms%2001==0)
+						{
+						LedOff(RED);
+						u8_mode_case =2;//game start
+						}
+				break;
+				case 2://game cycle 10 times
+				     //if(u8_temp_number==0)
+				     	{
+				     B_BUTTON_PUSHE = TRUE;
+				     	}
+					 u8_mode_case =3;
+					//if((u8_temp_number>=10)||(B_BUTTON_PUSHE==FALSE))//
+					   // u8_mode_case =3;
+					break;		
+	 	}
+	     if(u8_mode_case == 3)//game cycle
+	     	{
+	     	 if(B_BUTTON_PUSHE == TRUE)
+	     	 	{
+                  B_BUTTON_PUSHE =FALSE;
+                  tmep_led = u32_led_counter%4;//rand one led
+                  LedOn(tmep_led);//turn on
+ 	 	        }
+			if(WasButtonPressed(tmep_led))
+			    {
+			      LedOff(tmep_led);
+			      ButtonAcknowledge(tmep_led);//turn off tmep leds
+			      B_BUTTON_PUSHE = TRUE;
+			    }
+			   
+	     	}
+	 /*
+	 if(B_BUTTON_PUSHE == TRUE)
+	 	{
+	 	 if(G_u32SystemTime1ms%500==0)
+	 	 	{
+		 	 if(b_led_display == FALSE)
+			 {b_led_display = TRUE;
+			 tmep_led = u32_led_counter%8;
+                         }
+			 else
+			 {b_led_display=  FALSE;
+                         }
+	 	 	}
+	 	}
+	 if(WasButtonPressed(BUTTON3))
+	 	{
+	 	  ButtonAcknowledge(BUTTON3);
+		  if(B_BUTTON_PUSHE ==FALSE)
+		  	B_BUTTON_PUSHE = TRUE;
+		  else
+		  	B_BUTTON_PUSHE =FALSE;
+	 	}
+	 if(b_led_display == TRUE)
+	 	{
+	 	
+		LedOn(tmep_led);
+	 	}
+         else
+                LedOff(tmep_led);
+	 //else
+	 //	LedOff(tmep_led);*/
+	 u32_led_counter=rand();
+}
+void viclie(void)//back and forth the led light
+	{
+	static u8 u8_counter = 0;//increase the number
+	 const  u16 u16_const = 1000;//const for second
+	 static u16 u16_constant_for =0;
+	 static BOOL B_turn_right_left = FALSE;
+	 static u8 u8_counter_led_patter2 =0;
+	 static u8 u8_patter         =0 ;
+
+
+	 ///other partern led display.
+	 if(G_u32SystemTime1ms%5000==0)
+	 	{
+	 	for(u8_counter=0;u8_counter<=7;u8_counter++)
+	 	{
+	 	    LedOff(u8_counter);
+	 	}
+	 	  u8_patter = ledpart_one;
+		  u8_counter = 0;
+		  u16_constant_for =0;
+	 	}
+	 else if(G_u32SystemTime1ms%10001==0)
+	 	{
+	 	  for(u8_counter=0;u8_counter<=7;u8_counter++)
+	 	{
+	 	    LedOff(u8_counter);
+	 	}
+	 	   u8_patter = ledpart_two;
+		   u8_counter = 0;
+		  u16_constant_for =0;
+	 	}
+	 else if (G_u32SystemTime1ms%15001 ==0)//容易出错的地方
+	 	{
+	 	for(u8_counter=0;u8_counter<=7;u8_counter++)
+	 	{
+	 	    LedOff(u8_counter);
+	 	}
+	 	u8_patter    = ledpart_three;
+		u8_counter = 0;
+		  u16_constant_for =0;
+	 	}
+
+	 ///led patter
+	 switch (u8_patter)
+	 	{
+	 	case ledpart_three:///fade the led 
+			if(G_u32SystemTime1ms%200==0)
+				{for(u8_counter=0;u8_counter<=7;u8_counter++)
+					{
+					LedPWM(u8_counter,u16_constant_for);
+					
+					}
+			      u16_constant_for++;
+				  if(u16_constant_for==20)
+				  	u16_constant_for=0;
+				}
+			break;
+	 	case ledpart_one:
+			 loop_pattern_one:	 if(u16_constant_for<=u16_const/(u8_counter*6+1))//loop:
+								 	{
+								 	 //if(B_turn_right_left==FALSE)
+								 	  LedOn(4+u8_counter);//forth
+									// else
+									  LedOn(3-u8_counter);//back
+									  //u8
+									  u16_constant_for++;
+							                  //u8_counter++;
+								 	}
+						 else
+						 	{
+								//if(B_turn_right_left == FALSE)
+									
+							 	LedOff(4+u8_counter);
+								//else
+									LedOff(3-u8_counter);
+							 	u16_constant_for = 0;
+								if(u8_counter==3)
+						                {
+						            if(B_turn_right_left==FALSE)
+										B_turn_right_left = TRUE;
+									else
+										B_turn_right_left=FALSE;
+									u8_counter   =0;
+									goto loop_pattern_one;
+
+									//break;
+						                }
+			                u8_counter++;
+					//
+				 	}
+		 break;
+		 case ledpart_two:
+	 
+			  loop_pattern_two:	 if(u16_constant_for<=u16_const/(u8_counter*6+1))//loop:
+				 	{
+				 	 if(B_turn_right_left==FALSE)
+				 	  LedOn(u8_counter);//forth
+					 else
+					  LedOn(7-u8_counter);//back
+					  //u8
+					  u16_constant_for++;
+			                  //u8_counter++;
+				 	}
+				 else
+				 	{
+				 	if(B_turn_right_left == FALSE)
+						
+				 	LedOff(u8_counter);
+					else
+						LedOff(7-u8_counter);
+				 	u16_constant_for = 0;
+					if(u8_counter==7)
+			                {
+			            if(B_turn_right_left==FALSE)
+							B_turn_right_left = TRUE;
+						else
+							B_turn_right_left=FALSE;
+						u8_counter   =0;
+						goto loop_pattern_two;
+
+						//break;
+			                }
+			                u8_counter++;
+					//
+				 	}
+		 break;
+	 	}
+	 
+	}
+void test_led(void)
+{   
+     static bool led_on = FALSE;
+	 if(WasButtonPressed(BUTTON3))
+	 	{
+	 	ButtonAcknowledge(BUTTON3);
+		if(led_on == FALSE)
+			{
+			 led_on= TRUE;
+			}
+		else
+			led_on = FALSE;
+	 	}
+	 if(led_on== TRUE)
+	 	{LedOn(RED);}
+	 else
+	 	LedOff(RED);
+}
+void password_input_button(void)
+	{
+	  
+	  static u8 u8_password_save[10]={0};
+	  static u8 u8_password_input[10]={0};
+	  static u8 u8_mode          =0;
+	  static u8 u8_counter_password = 0;
+	  static u32 u32_double_button_old=0;
+	  static u8 u8_99=0;
+	  static u8 u8_temp  =0;
+	  static BOOL B_right_password =FALSE;
+	  if(WasButtonPressed(BUTTON3))
+	  	{
+	  	ButtonAcknowledge(BUTTON3);
+	  	//if(IsButtonPressed(BUTTON0))
+	  		//{
+	  		switch(u8_mode)
+	  			{
+	  			  case 0://开始设置密码
+				  	u8_mode = 5;
+					break;
+				  case 5://输入密码
+				  	u8_mode = 9;//输入密码模式
+                    break;
+				  case 9:
+				  	u8_mode = 11;//确认密码；
+				  	u32_double_button_old= G_u32SystemTime1ms;//记录当时按下按钮
+					break;
+				  /*case 11:
+				  	if((G_u32SystemTime1ms-u32_double_button_old)<=100)
+						u8_mode = 13;
+					else
+						u8_mode = 9;//input password mode
+				    break;
+				  case 13:
+				  	u8_mode =5;//back to setting password
+				  	break;
+				  	*/
+				  case 22:
+				  	LedOff(WHITE);
+				    LedOff(BLUE);
+				    LedOff(RED);
+					PWMAudioOff(BUZZER1);
+				  	B_right_password =FALSE;
+				  	u8_mode = 9;//back to input password mode
+				  	break;
+				  
+	  			}
+	  	    //u8_mode=5;//setting password mode 
+	  	    //PWMAudioOn(BUZZER1);
+		  		//}
+  	    //else 
+    	  //	{
+    	  //	 u8_mode =9;//input password mode
+  		// PWMAudioOff(BUZZER1);
+    	 // 	}
+		
+		  	
+	  	}
+       switch(u8_mode)
+       	{
+       	    case 5:
+				//for(u8_temp=0;u8_temp<=3;u8_temp++)
+				LedOn(BLUE);
+                                LedOff(RED);
+                                LedOff(WHITE);
+				if(WasButtonPressed(BUTTON1))
+					{
+					  u8_password_save[u8_temp] = 1;
+					   ButtonAcknowledge(BUTTON1);
+					   u8_temp++;
+					}
+				if(WasButtonPressed(BUTTON0))
+					{
+					  u8_password_save[u8_temp] = 0;
+					   ButtonAcknowledge(BUTTON0);
+					   u8_temp++;
+					}
+				if(WasButtonPressed(BUTTON2))
+					{
+					  u8_password_save[u8_temp] = 2;
+					   ButtonAcknowledge(BUTTON2);
+					   u8_temp++;
+					}
+				if((u8_temp>=10)||(WasButtonPressed(BUTTON3)))
+					{
+					  ButtonAcknowledge(BUTTON3);
+					  u8_mode = 9;
+					  u8_temp = 0;
+					  	
+					}
+				
+				break;
+			case 9:
+				LedOn(RED);
+				LedOff(BLUE);
+				LedOff(WHITE);
+					
+				if(WasButtonPressed(BUTTON1))
+					{
+					  u8_password_input[u8_temp] = 1;
+					   ButtonAcknowledge(BUTTON1);
+					   u8_temp++;
+					}
+				if(WasButtonPressed(BUTTON0))
+					{
+					  u8_password_input[u8_temp] = 0;
+					   ButtonAcknowledge(BUTTON0);
+					   u8_temp++;
+					}
+				if(WasButtonPressed(BUTTON2))
+					{
+					  u8_password_input[u8_temp] = 2;
+					   ButtonAcknowledge(BUTTON2);
+					   u8_temp++;
+					}
+				if((u8_temp>=10))
+					{
+					  ButtonAcknowledge(BUTTON3);
+					  u8_mode = 11;
+					  u8_temp = 0;
+					  	
+					}
+				break;
+			case 11:
+				LedOn(WHITE);
+				LedOff(BLUE);
+				LedOff(RED);
+				for(u8_temp=0;u8_temp<=9;u8_temp++)
+					{
+					if(u8_password_input[u8_temp]==u8_password_save[u8_temp])
+						B_right_password=TRUE;
+					else
+
+					{B_right_password=FALSE;
+					break;
+						}
+					
+					}
+				u8_mode= 22;//check the button mode
+				break;
+			 case 22:
+			 	LedOn(WHITE);
+				LedOn(BLUE);
+				LedOn(RED);
+			 	if(B_right_password ==TRUE)
+			 		{
+			 		if(G_u32SystemTime1ms%1000==0)
+			 			{
+			 			LedOn(LCD_GREEN);
+			 			}
+					else if(G_u32SystemTime1ms%2001==0)
+						{
+						LedOff(LCD_GREEN);
+						}
+			 		}
+				else
+					{
+					  if(G_u32SystemTime1ms%1000==0)
+					  	{
+					  	PWMAudioOff(BUZZER1);
+					  	}
+					  else if(G_u32SystemTime1ms%2002==0)
+					  	{
+					  	PWMAudioOn(BUZZER1);
+					  	}
+					}
+			 	break;
+       	}
+	 /* if(WasButtonPressed(BUTTON1))
+	  	{
+	  	  ButtonAcknowledge(BUTTON1);
+		  	if(IsButtonPressed(BUTTON0))
+		  		{
+		  	    u8_mode=5;//setting password mode 
+		  	    PWMAudioOn(BUZZER1);
+			  		}
+	  	    else 
+	    	  	{
+	    	  	 u8_mode =9;//input password mode
+	  		 PWMAudioOff(BUZZER1);
+	    	  	}
+			
+	  	}
+	  */
+	  //while
+	/*  if((u8_mode == 5))///why cannot do this 
+	  	{
+	  	 if(G_u32SystemTime1ms%1000==0)
+	  	 	{
+		 	LedOn(LCD_RED);
+	  	 	}
+		 else if(G_u32SystemTime1ms%500==0)
+		 	{
+		 	LedOff(LCD_RED);
+		 	}
+		 	
+	  	    PWMAudioOff(BUZZER1);
+	  	    if(WasButtonPressed(BUTTON0))
+	  	    	{
+	  	    	LedOn(RED);
+	  	    	u8_password_save[u8_counter_password] = 0;
+				ButtonAcknowledge(BUTTON0);
+				u8_counter_password++;
+				LedOff(RED);
+	  	    	}
+			if(WasButtonPressed(BUTTON1))
+				{
+				u8_password_save[u8_counter_password] = 1;
+				ButtonAcknowledge(BUTTON1);
+				u8_counter_password++;
+				}
+			if(WasButtonPressed(BUTTON2))
+				{
+				u8_password_save[u8_counter_password] = 2;
+				ButtonAcknowledge(BUTTON2);
+				u8_counter_password++;
+				}
+			if(WasButtonPressed(BUTTON3))
+				{
+				  u8_mode = 9;
+				  ButtonAcknowledge(BUTTON3);
+				}
+			if(u8_counter_password>=11)
+				{
+				u8_mode= 9;
+				LedOn(RED);
+				
+				u8_counter_password = 0;
+				//break;
+				}
+			
+	  	}
+	  if(u8_mode==9)
+	  	{
+	  	   // LedOn(LCD_GREEN);
+	  	}*/
+	}
+void password_button(void)
+	{  
+	     static u8 u8_password[4]={0,2,3,1};
+		 static u8 u8_input_button[4]={0};
+		 static  u8 u8_counter_buttton_press=0;
+		 static  BOOL B_Pass_No[3]= FALSE;
+		 u8 u8_temp_number     =0;
+		 if(u8_counter_buttton_press<=3)//you can input the password
+			 	{
+			 	B_Pass_No[0] = FALSE;//initation the logic parameter
+			 	
+			 if(WasButtonPressed(BUTTON0))
+			 	{
+			 	  u8_input_button[u8_counter_buttton_press]=0;
+				  LedOn(WHITE);
+			 	  
+			 	  ButtonAcknowledge(BUTTON0);
+				  u8_counter_buttton_press++;
+				  LedOff(WHITE);
+			 	}
+
+			 if(WasButtonPressed(BUTTON1))
+			 	{
+			 	 u8_input_button[u8_counter_buttton_press]=1;
+				 ButtonAcknowledge(BUTTON1);
+				 u8_counter_buttton_press++;
+			 	}
+			 if(WasButtonPressed(BUTTON2))
+			 	{
+			 	u8_input_button[u8_counter_buttton_press]=2;
+				ButtonAcknowledge(BUTTON2);
+				u8_counter_buttton_press++;
+			 	}
+			 if(WasButtonPressed(BUTTON3))
+			 	{
+			 	  u8_input_button[u8_counter_buttton_press]=3;
+				  	ButtonAcknowledge(BUTTON3);
+				  u8_counter_buttton_press++;
+			 	}
+		 	}
+		 if(u8_counter_buttton_press==4)//stop input password
+		 	LedOn(RED);
+		// for(u8_temp_number=0;u8_temp_number<=3;u8_temp_number++)
+		 	//{
+		 	do{
+		 	  if(u8_password[u8_temp_number]==u8_input_button[u8_temp_number])
+			  	{u8_temp_number++;
+			     B_Pass_No[0]= TRUE;
+		 	  	}
+			  else
+			  	{
+			  	  B_Pass_No[0]=FALSE;
+				  break;
+			  	}
+			  	
+		      } 	
+			 while(u8_temp_number<=3);//}
+	   if(B_Pass_No[0]==TRUE)
+	   	{
+	   	    if(G_u32SystemTime1ms%1000==0)
+				LedToggle(BLUE);
+			u8_counter_buttton_press=0;// start new input 
+	   	}
+		 
+	}
 //
 void Eie_classmate_work()
 {

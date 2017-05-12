@@ -16754,6 +16754,16 @@ void BCD_code_display(void);
 void Led_API_test(void);
 void button_pressed(void);
 void password_button(void);
+void Eie_classmate_work(void);
+void viclie(void);
+void password_input_button(void);
+
+void led_display(void);
+void led_display_rat(void);
+void test_led(void);
+void Debug_serial_port(void);
+void Buzzled_song(void);
+void Lcd_display(void);
 
 
 
