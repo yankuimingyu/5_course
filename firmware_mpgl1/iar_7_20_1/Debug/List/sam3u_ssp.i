@@ -16853,6 +16853,8 @@ void test_led(void);
 void Debug_serial_port(void);
 void Buzzled_song(void);
 void Lcd_display(void);
+void double_button_push(void);
+void buzzle_test(void);
 
 
 

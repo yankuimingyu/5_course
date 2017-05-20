@@ -39,6 +39,10 @@ Runs current task state.  Should only be called once in main loop.
 #define ledpart_one  1
 #define ledpart_two  2
 #define ledpart_three 3
+#define input_password_statue 5
+#define name_patter_flash    1
+#define lcd_display_roll     2
+
 ///
 /***********************************************************************************************************************
 Global variable definitions with scope across entire project.
@@ -96,8 +100,8 @@ void UserApp1Initialize(void)
 	LedOff(YELLOW);
 	LedOff(RED);
 	LedOff(PURPLE);
-	PWMAudioOff(BUZZER1);
-	PWMAudioSetFrequency(BUZZER1,500);
+	//PWMAudioOff(BUZZER1);
+	//PWMAudioSetFrequency(BUZZER1,500);
 /*
  LedOn(BLUE);
  LedToggle(PURPLE);
@@ -108,8 +112,9 @@ void UserApp1Initialize(void)
   if( 1 )
   {
    // UserApp1_StateMachine = UserApp1SM_Idle;
-   UserApp1_StateMachine =    Lcd_display;
+   UserApp1_StateMachine =      Lcd_display;
      //UserApp1_StateMachine =BCD_code_display;
+    // ledon
   }
   else
   {
@@ -148,7 +153,9 @@ void Lcd_display(void)
    u8 u8_len      = 0;
    u8_len         = strlen(u8_string);
    static u8 u8_counter =0;
-   if(G_u32SystemTime1ms%300==0)///
+   static u8 u8_lcd_display_patter =0;
+   static BOOL ON_OFF_turn   = FALSE;
+  /* if(G_u32SystemTime1ms%300==0)///
    	{ 
    	  //LCDCommand(LCD_CLEAR_CMD);//可以显示刷新
    	  LCDClearChars(LINE1_START_ADDR,u8_counter);
@@ -156,14 +163,50 @@ void Lcd_display(void)
 	  u8_counter++;
 	  if((u8_counter+u8_len)>=40)
 	  	u8_counter =0;
-   	}
+	  
+   	}*/
+
+  switch (u8_lcd_display_patter)
+  	{
+  	   case name_patter_flash:
+          if(G_u32SystemTime1ms%500==0)
+          	{
+			  	if(ON_OFF_turn==1){
+			    ON_OFF_turn =0;
+				LCDMessage(LINE1_START_ADDR,"Hello EIE");
+					}
+				else
+					
+					{ON_OFF_turn=0;
+				//LCDClearChars(u8 u8Address_,u8 u8CharactersToClear_)
+					}
+  			}
+		 //
+	   	 break;
+		case lcd_display_roll:
+          
+			
+		 break;
+  	}
+    if(WasButtonPressed(BUTTON1))
+    	{
+    	   ButtonAcknowledge(BUTTON1);
+		   u8_lcd_display_patter =name_patter_flash;//flash display the name 
+		   	
+    	}
+	if(WasButtonPressed(BUTTON2))
+		{
+      
+		   ButtonAcknowledge(BUTTON2);
+		   u8_lcd_display_patter= lcd_display_roll;
+		}
    if(WasButtonPressed(BUTTON0))
    	{
    	   ButtonAcknowledge(BUTTON0);
 	   u8_string = G_au8DebugScanfBuffer;
    	}
 }
-void Buzzled_song(void)
+void Buzzled_song(void)//tiger
 {
   static u8 u8_count_next =0;
   static BOOL B_off_buzzel=FALSE;
@@ -331,7 +374,7 @@ void Debug_serial_port(void)
 			  	  if(u8_temp_counter1%(10^u8_temp_counter)==0)//求出多少位
 				  	continue;
 				  else
-				  	u8_bit_set++;  
+				  	u8_bit_set++;  //计算输入名字次数的位数
 			  	}
 		  	
 		  	 for(u8_temp_counter=0;u8_temp_counter<=u8_bit_set;u8_temp_counter++)
@@ -353,6 +396,25 @@ void Debug_serial_port(void)
 	//DebugLineFeed();//this is what useful?
 }
 //
+void buzzle_test(void)
+{
+   static BOOL  b_on_off = FALSE;
+   PWMAudioSetFrequency(BUZZER1,500);
+   if(WasButtonPressed(BUTTON0))
+   	{
+   	    ButtonAcknowledge(BUTTON0);
+		if (b_on_off==FALSE)
+			{
+			  PWMAudioOff(BUZZER1);
+			  b_on_off =  TRUE;
+			}
+		else
+			{
+			PWMAudioOn(BUZZER1);
+			b_on_off  = FALSE;}
+		
+   	}
+}
 //to complete the code to scord 
 void led_display_rat(void)
 {
@@ -589,10 +651,101 @@ void test_led(void)
 	 else
 	 	LedOff(RED);
 }
+void double_button_push(void)
+	{
+     static u8 u8_ledon_count = 0;//indect led on
+     static u32 u32_old_time  = 0;//old time
+     static u8 u8_button_times =0;//push button times
+     static u8 double_conf     =0;//
+     static BOOL B_PUSH        =FALSE;
+     if(WasButtonPressed(BUTTON1))//open double state
+     	{
+     	 ButtonAcknowledge(BUTTON1);
+		 
+		  if(B_PUSH==FALSE)
+		  	{
+                          for(u8 u8_temp=0;u8_temp<=7;u8_temp++)
+                            {
+                               LedOff(u8_temp);
+                            }
+                          B_PUSH=TRUE;
+		  	}
+		  else
+		  	B_PUSH= FALSE;
+		  
+     	}
+     if(WasButtonPressed(BUTTON0))//button0 implement double
+          {
+             ButtonAcknowledge(BUTTON0);
+             for(u8 u8_temp=0;u8_temp<=7;u8_temp++)
+                  //{
+                     LedOff(u8_temp);
+             
+            if(u8_button_times==1)
+                  {
+                     if((G_u32SystemTime1ms-u32_old_time)>=500)//
+                     double_conf=0;//double false
+                     else
+                          double_conf=1;//yes
+                     u8_button_times=0;
+                     
+                  }
+             else
+                  {
+                    u32_old_time= G_u32SystemTime1ms;
+                    u8_button_times=1;
+		   double_conf=0;
+                  }
+                  
+          //}
+          }
+     if((G_u32SystemTime1ms-u32_old_time)>=700)//按下后一段时间就单键恢复
+        u8_button_times=0;
+       
+    if(B_PUSH==TRUE)
+    	{
+	   if(double_conf==0)
+	   	{
+
+	   	  if(G_u32SystemTime1ms%500==0)
+	   	  	{
+	   	  	 LedOn(u8_ledon_count);
+			
+			 if(u8_ledon_count>=7)
+			 	{
+			 	 for(u8 u8_temp=0;u8_temp<=7;u8_temp++)
+				   	{
+				   	   LedOff(u8_temp);
+				   	}
+			 	u8_ledon_count=0;
+			 	}
+			  u8_ledon_count++;
+	   	  	}
+	   	}
+	   else
+	   	{
+	   	  if(G_u32SystemTime1ms%500==0)
+	   	  	{
+	   	  	   LedOn(7-u8_ledon_count);
+			  
+			   if(u8_ledon_count>=7)
+			 	{
+			 	 for(u8 u8_temp=0;u8_temp<=7;u8_temp++)
+				   	{
+				   	   LedOff(u8_temp);
+				   	}
+			 	u8_ledon_count=0;
+			 	}
+			    u8_ledon_count++;
+	   	  	}
+	   	}
+    	  }
+	}
+        //}
 void password_input_button(void)
 	{
 	  
-	  static u8 u8_password_save[10]={0};
+	  static u8 u8_password_save[10]={0};//save password
 	  static u8 u8_password_input[10]={0};
 	  static u8 u8_mode          =0;
 	  static u8 u8_counter_password = 0;
@@ -600,6 +753,8 @@ void password_input_button(void)
 	  static u8 u8_99=0;
 	  static u8 u8_temp  =0;
 	  static BOOL B_right_password =FALSE;
+	  //PWMAudioOff(BUZZER1);
+	  PWMAudioSetFrequency(BUZZER1,500);//open buzzle
 	  if(WasButtonPressed(BUTTON3))
 	  	{
 	  	ButtonAcknowledge(BUTTON3);
@@ -608,7 +763,7 @@ void password_input_button(void)
 	  		switch(u8_mode)
 	  			{
 	  			  case 0://开始设置密码
-				  	u8_mode = 5;
+				  	u8_mode = input_password_statue;
 					break;
 				  case 5://输入密码
 				  	u8_mode = 9;//输入密码模式
@@ -650,7 +805,7 @@ void password_input_button(void)
 	  	}
        switch(u8_mode)
        	{
-       	    case 5:
+       	    case input_password_statue://setting password
 				//for(u8_temp=0;u8_temp<=3;u8_temp++)
 				LedOn(BLUE);
                                 LedOff(RED);
@@ -675,7 +830,7 @@ void password_input_button(void)
 					}
 				if((u8_temp>=10)||(WasButtonPressed(BUTTON3)))
 					{
-					  ButtonAcknowledge(BUTTON3);
+					  ButtonAcknowledge(BUTTON3);//end password
 					  u8_mode = 9;
 					  u8_temp = 0;
 					  	
@@ -707,7 +862,7 @@ void password_input_button(void)
 					}
 				if((u8_temp>=10))
 					{
-					  ButtonAcknowledge(BUTTON3);
+					 // ButtonAcknowledge(BUTTON3);
 					  u8_mode = 11;
 					  u8_temp = 0;
 					  	
