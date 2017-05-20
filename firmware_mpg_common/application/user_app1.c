@@ -178,7 +178,7 @@ void Lcd_display(void)
 				else
 					
 					{ON_OFF_turn=0;
-				//LCDClearChars(u8 u8Address_,u8 u8CharactersToClear_)
+				     LCDClearChars(LINE1_START_ADDR,40);//clear the lcd 
 					}
   			}
 		 //
